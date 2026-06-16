@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>VIG AI Agent</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous"/>
+  <style>
+
+    /* ── Navbar brand text ── */
+      .navbar-brand-text {
+        display: flex; flex-direction: column; line-height: 1.15;
+        text-decoration: none !important; margin-right: 2rem; flex-shrink: 0;
+      }
+      .navbar-brand-name {
+        font-size: 1.5rem; font-weight: 800; color: #ffffff;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+      }
+      .navbar-brand-tagline {
+        font-size: 0.72rem; font-weight: 500; color: #a8d4bc;
+        letter-spacing: 0.10em; text-transform: uppercase;
+      }
+      .navbar-brand-text:hover .navbar-brand-name    { color: #cfe3d4; }
+      .navbar-brand-text:hover .navbar-brand-tagline { color: #cfe3d4; }
+    html, body {
+      height: 100%;
+      margin: 0; padding: 0;
+      overflow: hidden;
+      background-color: #f4f8f4;
+    }
+    .vig-assistant-link {
+      background: #2f6b52 !important; color: white !important;
+      border-radius: 20px !important; padding: 5px 15px !important;
+      margin-left: 6px !important; font-weight: 600 !important;
+      font-size: 1.1rem !important; transition: background 0.2s;
+    }
+    .vig-assistant-link:hover, .vig-assistant-link.active-page {
+      background: #1f4d3a !important; color: #cfe3d4 !important;
+    }
+    /* Full-height layout below navbar */
+    .vig-shell {
+      display: flex;
+      height: calc(100vh - 78px);
+      overflow: hidden;
+    }
+    /* ── Sidebar ── */
+    .vig-sidebar {
+      width: 270px; flex-shrink: 0;
+      background: #ffffff; border-right: 1px solid #d7e3da;
+      display: flex; flex-direction: column;
+      padding: 20px 0 16px; overflow-y: auto;
+    }
+    .vig-sb-section { padding: 0 16px; margin-bottom: 18px; }
+    .vig-sb-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #7fa88c; margin-bottom: 8px;
+    }
+    .vig-sb-intro { font-size: 13px; color: #44524a; line-height: 1.6; }
+    .vig-sb-divider { border: none; border-top: 1px solid #e3ece5; margin: 6px 16px 14px; }
+    .vig-new-btn {
+      margin: 0 16px 18px; background: #1f4d3a; color: white; border: none;
+      border-radius: 8px; padding: 10px 0; font-size: 14px; font-weight: 600;
+      cursor: pointer; width: calc(100% - 32px); transition: background 0.2s;
+    }
+    .vig-new-btn:hover { background: #2f6b52; }
+    .vig-quick {
+      display: block; width: 100%; text-align: left;
+      background: none; border: 1px solid #d7e3da; border-radius: 8px;
+      padding: 9px 12px; font-size: 13px; color: #1f4d3a;
+      cursor: pointer; margin-bottom: 7px; line-height: 1.4;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .vig-quick:hover { background: #eef6f0; border-color: #2f6b52; }
+    /* ── Chat column ── */
+    .vig-chat-col {
+      flex: 1; display: flex; flex-direction: column;
+      min-width: 0; background: #f4f8f4;
+    }
+    .vig-chat-hdr {
+      background: #ffffff; border-bottom: 1px solid #d7e3da;
+      padding: 14px 28px; display: flex; align-items: center;
+      justify-content: space-between; flex-shrink: 0;
+    }
+    .vig-chat-hdr-title { font-size: 16px; font-weight: 700; color: #1f4d3a; }
+    .vig-chat-hdr-sub   { font-size: 13px; color: #66756d; margin-top: 1px; }
+    .vig-calc-btn {
+      background: #1f4d3a; color: white; border: none;
+      border-radius: 20px; padding: 8px 20px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .vig-calc-btn:hover { background: #2f6b52; }
+    /* Messages */
+    .vig-msgs {
+      flex: 1; overflow-y: auto; padding: 28px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .vig-welcome {
+      max-width: 680px; margin: 0 auto 8px;
+      background: #ffffff; border: 1px solid #d7e3da;
+      border-radius: 12px; padding: 28px 32px; text-align: center;
+    }
+    .vig-welcome h2 { color: #1f4d3a; font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
+    .vig-welcome p  { color: #44524a; font-size: 14px; line-height: 1.7; margin-bottom: 0; }
+    .vig-row       { display: flex; max-width: 780px; width: 100%; margin: 0 auto; }
+    .vig-row.user  { justify-content: flex-end; }
+    .vig-row.agent { justify-content: flex-start; }
+    .vig-bubble {
+      max-width: 78%; padding: 12px 16px; border-radius: 12px;
+      font-size: 14px; line-height: 1.65;
+    }
+    .vig-row.user  .vig-bubble { background: #1f4d3a; color: white; border-bottom-right-radius: 4px; }
+    .vig-row.agent .vig-bubble { background: #ffffff; color: #22302a; border: 1px solid #d7e3da; border-bottom-left-radius: 4px; }
+    .vig-calc-card {
+      max-width: 780px; width: 100%; margin: 0 auto;
+      background: #ffffff; border: 1px solid #d7e3da;
+      border-left: 4px solid #2f6b52; border-radius: 10px;
+      padding: 14px 18px; font-size: 13px;
+    }
+    .vig-calc-card-title { font-weight: 700; color: #1f4d3a; margin-bottom: 8px; font-size: 14px; }
+    .vig-calc-card table { width: 100%; border-collapse: collapse; }
+    .vig-calc-card td   { padding: 4px 6px; }
+    .vig-calc-card td:first-child { color: #66756d; width: 60%; }
+    .vig-calc-card td:last-child  { font-weight: 600; color: #22302a; text-align: right; }
+    .vig-dots span {
+      display: inline-block; width: 7px; height: 7px; margin: 0 2px;
+      background: #7fa88c; border-radius: 50%;
+      animation: vbounce 1.2s infinite ease-in-out;
+    }
+    .vig-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .vig-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes vbounce { 0%,80%,100%{transform:scale(0.7);opacity:0.5} 40%{transform:scale(1.1);opacity:1} }
+    /* Input */
+    .vig-input-area {
+      background: #ffffff; border-top: 1px solid #d7e3da;
+      padding: 16px 28px; flex-shrink: 0;
+    }
+    .vig-input-wrap {
+      max-width: 780px; margin: 0 auto;
+      display: flex; gap: 10px; align-items: flex-end;
+    }
+    .vig-input {
+      flex: 1; padding: 11px 16px;
+      border: 1px solid #c8d8cc; border-radius: 24px;
+      font-size: 14px; outline: none; resize: none;
+      font-family: inherit; color: #22302a; background: #f7fbf7;
+      transition: border-color 0.15s; line-height: 1.5;
+      min-height: 44px; max-height: 140px; overflow-y: auto;
+    }
+    .vig-input:focus { border-color: #2f6b52; background: #ffffff; }
+    .vig-send {
+      background: #1f4d3a; color: white; border: none; border-radius: 50%;
+      width: 44px; height: 44px; font-size: 18px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .vig-send:hover { background: #2f6b52; }
+    .vig-send:disabled { background: #c8d8cc; cursor: default; }
+    .vig-hint { text-align: center; font-size: 11px; color: #7fa88c; margin-top: 8px; }
+    /* ── Calculator dialog ── */
+    .vig-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(31,77,58,0.18); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .vig-overlay.open { display: flex; }
+    .vig-dlg {
+      background: #ffffff; border-radius: 14px;
+      box-shadow: 0 16px 48px rgba(31,77,58,0.18);
+      width: 480px; max-width: 96vw; max-height: 88vh;
+      overflow-y: auto; display: flex; flex-direction: column;
+    }
+    .vig-dlg-hdr {
+      background: #1f4d3a; color: white; padding: 14px 20px;
+      border-radius: 14px 14px 0 0; font-weight: 700; font-size: 15px;
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .vig-dlg-x { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    .vig-dlg-body { padding: 20px; }
+    .d-slabel { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#7fa88c; margin-bottom:6px; }
+    .d-stitle  { font-size:15px; font-weight:700; color:#22302a; margin-bottom:16px; }
+    .d-sectitle{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#2f6b52; border-bottom:1px solid #e3ece5; padding-bottom:4px; margin:16px 0 10px; }
+    .d-g2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+    .d-g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
+    .d-card {
+      border:1.5px solid #d7e3da; border-radius:9px; padding:10px;
+      text-align:center; cursor:pointer; font-size:13px; background:white; color:#22302a;
+      transition:all .15s;
+    }
+    .d-card:hover { border-color:#2f6b52; background:#eef6f0; }
+    .d-card.sel   { border-color:#1f4d3a; background:#1f4d3a; color:white; }
+    .d-card .cn   { font-weight:700; display:block; margin-bottom:2px; }
+    .d-card .cd   { font-size:11px; opacity:.7; }
+    .d-field { margin-bottom:12px; }
+    .d-field label { display:block; font-size:12px; color:#44524a; margin-bottom:3px; font-weight:700; }
+    .d-hint { font-size:11px; color:#7fa88c; margin-bottom:4px; }
+    .d-field input, .d-field select {
+      width:100%; padding:7px 10px; border:1px solid #c8d8cc; border-radius:7px;
+      font-size:13px; outline:none; box-sizing:border-box; color:#22302a; background:#f7fbf7;
+    }
+    .d-field input:focus, .d-field select:focus { border-color:#2f6b52; background:white; }
+    .d-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .d-info { background:#eef6f0; border-radius:8px; padding:10px 13px; font-size:13px; color:#44524a; margin-bottom:12px; }
+    .d-nav  { display:flex; justify-content:space-between; align-items:center; margin-top:18px; padding-top:14px; border-top:1px solid #e3ece5; }
+    .d-back { background:none; border:1px solid #c8d8cc; border-radius:20px; padding:7px 18px; font-size:13px; cursor:pointer; color:#44524a; }
+    .d-back:hover { border-color:#2f6b52; color:#1f4d3a; }
+    .d-next { background:#1f4d3a; color:white; border:none; border-radius:20px; padding:8px 24px; font-size:13px; cursor:pointer; font-weight:700; transition:background .2s; }
+    .d-next:hover { background:#2f6b52; }
+    .d-next:disabled { background:#c8d8cc; cursor:default; }
+    .d-dots { display:flex; gap:6px; align-items:center; }
+    .d-dot  { width:7px; height:7px; border-radius:50%; background:#d7e3da; }
+    .d-dot.on { background:#1f4d3a; }
+    .d-rhero { background:#eef6f0; border-radius:10px; padding:14px 16px; margin-bottom:12px; border-left:4px solid #2f6b52; }
+    .d-rgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .d-rlbl  { font-size:11px; color:#66756d; }
+    .d-rval  { font-size:22px; font-weight:700; color:#1f4d3a; }
+    .d-runit { font-size:11px; color:#66756d; }
+    .d-rextra{ font-size:12px; color:#66756d; margin-top:8px; }
+    .d-bars  { background:#f7fbf7; border-radius:8px; padding:10px 13px; margin-bottom:10px; }
+    .d-bar   { margin-bottom:6px; }
+    .d-barlbl{ display:flex; justify-content:space-between; font-size:12px; margin-bottom:2px; }
+    .d-trk   { background:#d7e3da; border-radius:4px; height:6px; }
+    .d-fill  { height:6px; border-radius:4px; }
+    .d-temps { background:#f7fbf7; border-radius:8px; padding:8px 12px; margin-bottom:10px; font-size:12px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center; }
+    .d-tlbl  { color:#66756d; }
+    .d-cstar { background:#eef6f0; border-radius:8px; padding:9px 13px; font-size:12px; color:#44524a; margin-bottom:10px; }
+    .d-discuss{ background:#2f6b52; color:white; border:none; border-radius:20px; padding:8px 22px; font-size:13px; cursor:pointer; font-weight:600; transition:background .2s; }
+    .d-discuss:hover { background:#1f4d3a; }
+    /* Chart card */
+    .vig-chart-card {
+      max-width: 780px; width: 100%; margin: 0 auto;
+      background: #ffffff; border: 1px solid #d7e3da;
+      border-left: 4px solid #2f6b52; border-radius: 10px;
+      padding: 16px 18px 12px; font-size: 13px;
+    }
+    .vig-chart-title { font-weight: 700; color: #1f4d3a; margin-bottom: 12px; font-size: 14px; }
+    .vig-chart-canvas { width: 100% !important; max-height: 320px; }
+    .vig-chart-note { font-size: 11px; color: #7fa88c; margin-top: 8px; text-align: right; }
+    /* Thermal stress result card */
+    .vig-stress-card {
+      max-width: 780px; width: 100%; margin: 0 auto;
+      background: #ffffff; border: 1px solid #d7e3da;
+      border-left: 4px solid #7b3fa0; border-radius: 10px;
+      padding: 16px 18px; font-size: 13px;
+    }
+    .vig-stress-card-title { font-weight: 700; color: #7b3fa0; margin-bottom: 10px; font-size: 14px; }
+    .vig-stress-hero { background: #f5f0fb; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+    .vig-stress-hero-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .vig-stress-lbl { font-size: 11px; color: #66756d; }
+    .vig-stress-val { font-size: 20px; font-weight: 700; color: #7b3fa0; }
+    .vig-stress-unit { font-size: 11px; color: #66756d; }
+    .vig-stress-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; font-size: 12px; }
+    .vig-stress-grid td:first-child { color: #66756d; }
+    .vig-stress-grid td:last-child { font-weight: 600; color: #22302a; text-align: right; }
+    .vig-stress-atm { background: #eef6f0; border-radius: 8px; padding: 10px 13px; font-size: 12px; margin-top: 8px; }
+    .vig-stress-atm-title { font-weight: 700; color: #1f4d3a; margin-bottom: 6px; }
+    /* Point query panel */
+    .vig-stress-query-panel {
+      background: #fafbfa; border: 1px solid #d7e3da; border-radius: 10px;
+      padding: 14px 16px; margin-top: 10px; font-size: 13px;
+    }
+    .vig-stress-query-title { font-weight: 700; color: #1f4d3a; margin-bottom: 10px; font-size: 13px; }
+    .vig-stress-query-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 8px; }
+    .vig-stress-query-field { display: flex; flex-direction: column; gap: 2px; }
+    .vig-stress-query-field label { font-size: 11px; font-weight: 700; color: #44524a; }
+    .vig-stress-query-field input { width: 80px; padding: 5px 8px; border: 1px solid #c8d8cc; border-radius: 6px; font-size: 13px; }
+    .vig-stress-query-btn { background: #7b3fa0; color: white; border: none; border-radius: 20px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s; white-space: nowrap; }
+    .vig-stress-query-btn:hover { background: #5d2e7a; }
+    .vig-stress-query-btn.green { background: #1f4d3a; }
+    .vig-stress-query-btn.green:hover { background: #2f6b52; }
+    .vig-stress-divider { border: none; border-top: 1px solid #e3ece5; margin: 10px 0; }
+    /* Failure Assessment section */
+    .vig-fa-section {
+      margin-top: 14px; border-top: 2px solid #e3ece5; padding-top: 12px;
+    }
+    .vig-fa-title {
+      font-weight: 700; color: #22302a; font-size: 13px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .vig-fa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .vig-fa-box {
+      background: #fafbfa; border: 1px solid #d7e3da; border-radius: 8px;
+      padding: 10px 12px; font-size: 12px;
+    }
+    .vig-fa-box-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: #66756d; margin-bottom: 6px;
+    }
+    .vig-fa-badge {
+      display: inline-block; padding: 2px 9px; border-radius: 10px;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.04em; margin-bottom: 6px;
+    }
+    .vig-fa-badge.pass { background: #d4edda; color: #1b5e20; }
+    .vig-fa-badge.fail { background: #fde8e8; color: #c00020; }
+    .vig-fa-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 11px; }
+    .vig-fa-row span:first-child { color: #66756d; }
+    .vig-fa-row span:last-child { font-weight: 600; color: #22302a; }
+    .vig-fa-pf-label { font-size: 10px; color: #66756d; margin-top: 6px; }
+    .vig-fa-pf-val { font-size: 17px; font-weight: 700; color: #7b3fa0; font-family: monospace; }
+    .vig-fa-interp { font-size: 10px; color: #44524a; margin-top: 3px; font-style: italic; line-height: 1.4; }
+    .vig-fa-note {
+      font-size: 11px; color: #7fa88c; margin-top: 8px;
+      background: #f0f7f3; padding: 6px 10px; border-radius: 6px; line-height: 1.5;
+    }
+    .vig-fa-nil { font-size: 11px; color: #7fa88c; padding: 10px 0; text-align: center; }
+    /* Coordinate diagram */
+    .vig-coord-diagram { background: #f5f0fb; border-radius: 8px; padding: 12px; margin-bottom: 10px; text-align: center; }
+    .vig-coord-diagram svg { max-width: 100%; }
+    /* Responsive */
+    @media (max-width:768px) {
+      .vig-sidebar { display:none; }
+      .vig-msgs { padding:16px; }
+      .vig-input-area { padding:12px 16px; }
+      .vig-chat-hdr { padding:12px 16px; }
+      .vig-bubble { max-width:92%; }
+    }
+  
+    /* ── Trial nav ─────────────────────────────────────────── */
+    .trial-nav {
+      background: #1f4d3a; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px; flex-shrink: 0;
+    }
+    .trial-brand { display: flex; flex-direction: column; line-height: 1.15; }
+    .trial-brand-name {
+      font-size: 1.2rem; font-weight: 800; color: #fff;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      font-family: "Franklin Gothic Medium","Arial Narrow",Arial,sans-serif;
+    }
+    .trial-brand-tag {
+      font-size: 0.63rem; color: #a8d4bc;
+      letter-spacing: 0.10em; text-transform: uppercase;
+    }
+    .trial-badge {
+      background: rgba(255,255,255,0.12); color: #a8d4bc;
+      border: 1px solid rgba(255,255,255,0.20); border-radius: 12px;
+      padding: 4px 12px; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .trial-expiry { font-size: 11px; color: #7fa88c; margin-left: 10px; }
+    .trial-nav-right { display: flex; align-items: center; }
+    /* Override shell height for 56px trial nav */
+    .vig-shell { height: calc(100vh - 56px); }
+
+    /* ── Auth gate overlay ──────────────────────────────────── */
+    #trialGate {
+      position: fixed; inset: 0; background: #f0f5f1;
+      display: flex; align-items: center; justify-content: center; z-index: 9999;
+    }
+    #trialGate.hidden { display: none; }
+    .gate-spinner {
+      width: 38px; height: 38px;
+      border: 3px solid #d7e3da; border-top-color: #1f4d3a;
+      border-radius: 50%; animation: gspin 0.7s linear infinite;
+    }
+    @keyframes gspin { to { transform: rotate(360deg); } }
+    #trialDenied {
+      position: fixed; inset: 0; background: #f0f5f1;
+      display: none; align-items: center; justify-content: center; z-index: 9999;
+    }
+    #trialDenied.show { display: flex; }
+    .denied-card {
+      background: #fff; border-radius: 18px;
+      box-shadow: 0 8px 40px rgba(31,77,58,0.13);
+      padding: 52px 44px; width: 400px; max-width: 94vw; text-align: center;
+    }
+    .denied-brand {
+      font-size: 1.2rem; font-weight: 800; color: #1f4d3a;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      font-family: "Franklin Gothic Medium","Arial Narrow",Arial,sans-serif; margin-bottom: 3px;
+    }
+    .denied-tag { font-size: 0.68rem; color: #7fa88c; letter-spacing: 0.11em;
+      text-transform: uppercase; margin-bottom: 28px; }
+    .denied-msg { font-size: 0.9rem; color: #44524a; line-height: 1.65; margin-bottom: 26px; }
+    .denied-btn {
+      display: inline-block; padding: 12px 30px; background: #1f4d3a;
+      color: #fff; border-radius: 9px; font-weight: 700; font-size: 14px;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .denied-btn:hover { background: #2f6b52; color: #fff; }
+  
+    /* Trial simplification: hide calculator UI */
+    .vig-calc-btn,
+    .vig-overlay,
+    .vig-dlg {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ AUTH GATE ════════════════════════════════════════════════ -->
+<div id="trialGate">
+  <div class="gate-spinner"></div>
+</div>
+
+<!-- ══ ACCESS DENIED ════════════════════════════════════════════ -->
+<div id="trialDenied">
+  <div class="denied-card">
+    <div class="denied-brand">VIG AI Agent</div>
+    <div class="denied-tag">Trial Access</div>
+    <p class="denied-msg">Your trial session has expired or is no longer valid.<br>
+    Please return to the access page and enter your token.</p>
+    <a class="denied-btn" href="access.html">Enter Access Token</a>
+  </div>
+</div>
+
+<!-- ══ TRIAL NAVBAR ═════════════════════════════════════════════ -->
+<nav class="trial-nav">
+  <div class="trial-brand">
+    <span class="trial-brand-name">VIG AI Agent</span>
+    <span class="trial-brand-tag">Trial Access</span>
+  </div>
+  <div class="trial-nav-right">
+    <span class="trial-badge">Trial Access</span>
+    <span class="trial-expiry" id="trialExpiryLabel"></span>
+  </div>
+</nav>
+
+<!-- ══ PAGE SHELL ═══════════════════════════════════════════════ -->
+<div class="vig-shell">
+  <aside class="vig-sidebar">
+    <div class="vig-sb-section">
+      <div class="vig-sb-label">About this tool</div>
+      <p class="vig-sb-intro">Ask questions about Vacuum Insulated Glass, including thermal performance, support pillars, coatings, vacuum behaviour, mechanical design, standards, manufacturing, and applications.</p>
+    </div>
+    <hr class="vig-sb-divider"/>
+    <div class="vig-sb-section">
+      <div class="vig-sb-label">Suggested questions</div>
+            <button class="vig-quick" onclick="vigQuick(this)">What is Vacuum Insulated Glass and where is it useful?</button>
+      <button class="vig-quick" onclick="vigQuick(this)">What factors control VIG thermal performance?</button>
+      <button class="vig-quick" onclick="vigQuick(this)">How do support pillars affect VIG design?</button>
+      <button class="vig-quick" onclick="vigQuick(this)">How do low-emissivity coatings affect VIG performance?</button>
+      <button class="vig-quick" onclick="vigQuick(this)">What role do residual gases and vacuum quality play in VIG?</button>
+      <button class="vig-quick" onclick="vigQuick(this)">What should be considered when comparing VIG with IGU or triple glazing?</button>
+    </div>
+    <hr class="vig-sb-divider"/>
+    <div class="vig-sb-section">
+      <button class="vig-new-btn" onclick="vigNewChat()">&#43; New Conversation</button>
+    </div>
+  </aside>
+
+  <div class="vig-chat-col">
+    <div class="vig-chat-hdr">
+      <div>
+        <div class="vig-chat-hdr-title">VIG AI Agent</div>
+        <div class="vig-chat-hdr-sub">Vacuum Insulated Glass technical assistant</div>
+      </div>
+    </div>
+    <div class="vig-msgs" id="vigMsgs">
+      <div class="vig-welcome">
+        <h2>Welcome to the VIG AI Agent</h2>
+        <p>This trial assistant helps answer technical questions about Vacuum Insulated Glass in a clear and practical way.</p>
+        <p style="text-align:left;margin-top:10px;margin-bottom:4px;">
+          You can ask about VIG thermal performance, support pillar design, low-emissivity coatings, edge sealing, vacuum quality, residual gases, mechanical behaviour, manufacturing considerations, standards, and comparison with conventional insulating glass units.
+        </p>
+        <p style="text-align:left;margin-bottom:4px;">
+          For best results, ask a specific question and include relevant details such as glass thickness, coating type, pillar spacing, panel size, boundary conditions, climate, or the application you are considering.
+        </p>
+        <p style="text-align:left;margin-bottom:0;">
+          This is a trial technical assistant. Responses are intended to support early-stage understanding and discussion, not replace project-specific engineering review.
+        </p>
+      </div>
+    </div>
+    <div class="vig-input-area">
+      <div class="vig-input-wrap">
+        <textarea class="vig-input" id="vigIn" rows="1"
+          placeholder="Ask a VIG question…"
+          onkeydown="vigKD(event)" oninput="vigAS(this)"></textarea>
+        <button class="vig-send" id="vigSendBtn" onclick="vigSend()" title="Send">&#9658;</button>
+      </div>
+      <div class="vig-hint">VIG technical knowledge base</div>
+    </div>
+  </div>
+</div>
+
+<footer>Trial VIG AI Agent</footer>
+
+<!-- External libraries -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<!-- VIG Physics Engine -->
+<script>
+
+/* ═══════════════════════════════════════════════════════════════
+   VIG CLIENT-SIDE PHYSICS ENGINE
+   Mirrors lambda_function.py so sweeps run entirely in-browser.
+   ═══════════════════════════════════════════════════════════════ */
+var VIG_SIGMA   = 5.67e-8;
+var VIG_R_UNIV  = 8314.46;
+var VIG_ALPHA   = 0.8;
+var VIG_GAMMA   = 1.33;
+var VIG_M       = 18.23;
+var VIG_BC_NFRC = {T_out:255.15, T_in:294.15, R_o:0.0340, R_i:0.1470};
+var VIG_BC_ISO  = {T_out:273.15, T_in:293.15, R_o:0.0400, R_i:0.1300};
+
+function vigCalcGas(P, T_m, alpha, gamma, M) {
+  var a = (alpha !== undefined && alpha !== null) ? alpha : VIG_ALPHA;
+  var g = (gamma !== undefined && gamma !== null) ? gamma : VIG_GAMMA;
+  var mw = (M !== undefined && M !== null) ? M : VIG_M;
+  var B = (a/(2.0-a)) * ((g+1.0)/(g-1.0)) *
+          Math.sqrt(VIG_R_UNIV / (8.0*Math.PI*mw*T_m));
+  return B * P;
+}
+function vigCalcRad(e2, e3, T2, T3) {
+  var denom = (1.0/e2 + 1.0/e3 - 1.0);
+  var Tav = (T2 + T3) / 2.0;
+  return (4.0*VIG_SIGMA*Math.pow(Tav,3)) / denom;
+}
+function vigCalcRadFromMean(e2, e3, Tm) {
+  var denom = (1.0/e2 + 1.0/e3 - 1.0);
+  return (4.0*VIG_SIGMA*Math.pow(Tm,3)) / denom;
+}
+function vigEllipticKLinearBearing(L, W) {
+  var ratio = W / L;
+  var m = (1.0 + ratio) * Math.sqrt(ratio);
+  var n = 1.0 + Math.sqrt(ratio);
+  return (Math.PI * Math.sqrt(2.0) / Math.sqrt(m)) *
+         (1.0 - (n * Math.pow(2.0, 0.25)) / (4.0 * Math.pow(m, 0.25)));
+}
+function vigPillarResistance(pillar_type, pp) {
+  var kg1 = pp.k_glass1 !== undefined ? pp.k_glass1 : 1.0;
+  var kg2 = pp.k_glass2 !== undefined ? pp.k_glass2 : 1.0;
+  var kp  = pp.k_pillar, h = pp.h;
+  if (pillar_type === "cylindrical") {
+    var r = pp.r;
+    return 1.0/(4.0*kg1*r) + 1.0/(4.0*kg2*r) + h/(kp*Math.PI*r*r);
+  }
+  if (pillar_type === "polygon") {
+    var sA = Math.sqrt(pp.A_contact);
+    return 1.0/(4.0*kg1*sA) + 1.0/(4.0*kg2*sA) + h/(kp*pp.A_contact);
+  }
+  if (pillar_type === "linear_bearing") {
+    var L=pp.L, W=pp.W, A=L*W, Rc, Rs;
+    var ratio = (W > 0) ? L/W : 1.0;
+    if (ratio < 2.0) {
+      var K1 = vigEllipticKLinearBearing(L, W);
+      var factor = 2.0 / Math.sqrt(Math.PI);
+      Rc = (factor*K1)/(4.0*kg1*L);
+      Rs = (factor*K1)/(4.0*kg2*L);
+    } else {
+      var sA2 = Math.sqrt(A);
+      Rc = 1.0/(4.0*kg1*sA2); Rs = 1.0/(4.0*kg2*sA2);
+    }
+    return Rc + Rs + h/(kp*A);
+  }
+  if (pillar_type === "truncated_cone") {
+    var r1=pp.r1, r2=pp.r2;
+    var Rd = (Math.abs(r1-r2) > 1e-10) ? h/(kp*Math.PI*r1*r2) : h/(kp*Math.PI*r1*r1);
+    return 1.0/(4.0*kg1*r1) + 1.0/(4.0*kg2*r2) + Rd;
+  }
+  if (pillar_type === "annulus") {
+    var ri = pp.r_i, ro = pp.r_o;
+    if (!(ro > 0) || !(ri > 0) || !(ri < ro)) return Infinity;
+    var eta = ri / ro;
+    var invEta = 1.0 / eta;
+    var A3 = Math.PI * (ro*ro - ri*ri);
+    var Rc3, Rs3;
+
+    if (invEta > 1.0 && invEta <= 1.1) {
+      var num = Math.log(16.0) + Math.log((1.0 + eta) / (1.0 - eta));
+      Rc3 = (1.0 / (Math.PI*Math.PI*kg1*ro)) * (num / (1.0 + eta));
+      Rs3 = (1.0 / (Math.PI*Math.PI*kg2*ro)) * (num / (1.0 + eta));
+    } else if (invEta > 1.1) {
+      var root = Math.sqrt(1.0 - eta*eta);
+      var base = Math.acos(eta) + root * Math.atanh(eta);
+      var corr = 1.0 + (0.0143 * Math.pow(Math.tan(1.28 * eta), 3)) / eta;
+      Rc3 = (Math.PI / (8.0*kg1*ro)) * (1.0 / (base * corr));
+      Rs3 = (Math.PI / (8.0*kg2*ro)) * (1.0 / (base * corr));
+    } else {
+      return Infinity;
+    }
+    return Rc3 + Rs3 + h/(kp*A3);
+  }
+  if (pillar_type === "c_shaped") {
+    var R_ann = vigPillarResistance("annulus", pp);
+    return (pp.f > 0) ? R_ann/pp.f : Infinity;
+  }
+  return Infinity;
+}
+function vigRunCalc(params) {
+  var mode = params.mode || "environmental";
+  var e2   = params.epsilon2 !== undefined ? params.epsilon2 : 0.84;
+  var e3   = params.epsilon3 !== undefined ? params.epsilon3 : 0.84;
+  var tg1  = params.t_g1 !== undefined ? params.t_g1 : 0.003;
+  var kg1  = params.k_g1 !== undefined ? params.k_g1 : 1.0;
+  var tg2  = params.t_g2 !== undefined ? params.t_g2 : 0.003;
+  var kg2  = params.k_g2 !== undefined ? params.k_g2 : 1.0;
+  var P    = params.P !== undefined ? params.P : 0.1;
+  var S_p  = params.S_p;
+  var alpha = params.alpha !== undefined ? params.alpha : VIG_ALPHA;
+  var gamma = params.gamma !== undefined ? params.gamma : VIG_GAMMA;
+  var Mgas  = params.M !== undefined ? params.M : VIG_M;
+  var bc   = (params.bc === "ISO") ? VIG_BC_ISO : VIG_BC_NFRC;
+  var T_out = params.T_out !== undefined ? params.T_out : bc.T_out;
+  var T_in  = params.T_in  !== undefined ? params.T_in  : bc.T_in;
+  var R_o = (params.h_o !== undefined && params.h_o > 0) ? 1.0/params.h_o
+            : (params.R_o !== undefined ? params.R_o : bc.R_o);
+  var R_i = (params.h_i !== undefined && params.h_i > 0) ? 1.0/params.h_i
+            : (params.R_i !== undefined ? params.R_i : bc.R_i);
+
+  // Fixed surface-to-surface conductance mode: user supplies C_gap directly.
+  if (mode === "from_surface_to_surface") {
+    var C_gap_fixed = params.C_gap !== undefined ? params.C_gap
+                    : (params.U_surface_to_surface !== undefined ? params.U_surface_to_surface : undefined);
+    if (!(C_gap_fixed > 0)) throw new Error("C_gap or U_surface_to_surface is required for from_surface_to_surface mode");
+    var R_tot_fixed = R_o + tg1/kg1 + 1.0/C_gap_fixed + tg2/kg2 + R_i;
+    var U_fixed = 1.0 / R_tot_fixed;
+    return {
+      U_air_to_air: Math.round(U_fixed*10000)/10000,
+      U_surface_to_surface: Math.round(C_gap_fixed*10000)/10000,
+      R_value: Math.round((1.0/U_fixed)*10000)/10000,
+      C_pa: null,
+      C_rad: null,
+      C_cond: null
+    };
+  }
+
+  // Fixed C* mode: iterate T2/T3, compute Crad from Tav=(T2+T3)/2.
+  if (mode === "from_c_star") {
+    var C_star = params.C_star;
+    if (!(C_star > 0)) throw new Error("C_star is required for from_c_star mode");
+    var T2s = T_out, T3s = T_in, T_ms = (T_out + T_in) / 2.0;
+    var C_rad_s, C_gap_s, R_tot_s, q_s;
+    for (var j=0; j<50; j++) {
+      T_ms = (T2s + T3s) / 2.0;
+      C_rad_s = vigCalcRadFromMean(e2, e3, T_ms);
+      C_gap_s = C_star + C_rad_s;
+      R_tot_s = R_o + tg1/kg1 + 1.0/C_gap_s + tg2/kg2 + R_i;
+      q_s = (T_in-T_out)/R_tot_s;
+      var T2n = T_out + q_s*(R_o + tg1/kg1);
+      var T3n = T_in  - q_s*(R_i + tg2/kg2);
+      if (Math.abs(T2n-T2s) < 0.01 && Math.abs(T3n-T3s) < 0.01) {
+        T2s = T2n; T3s = T3n; T_ms = (T2s + T3s) / 2.0; break;
+      }
+      T2s = T2n; T3s = T3n;
+    }
+    var U_cs = 1.0/R_tot_s;
+    return {
+      U_air_to_air: Math.round(U_cs*10000)/10000,
+      U_surface_to_surface: Math.round(C_gap_s*10000)/10000,
+      R_value: Math.round((1.0/U_cs)*10000)/10000,
+      C_pa: null,
+      C_rad: Math.round(C_rad_s*1000000)/1000000,
+      C_cond: null
+    };
+  }
+
+  var R_p  = (function(){
+    // Ensure pillar_params has k_glass1/k_glass2 set from top-level values
+    var pp = params.pillar_params || {};
+    if(pp.k_glass1===undefined) pp.k_glass1 = kg1;
+    if(pp.k_glass2===undefined) pp.k_glass2 = kg2;
+    return vigPillarResistance(params.pillar_type, pp);
+  })();
+  var C_pa = 1.0 / (R_p * S_p * S_p);
+  var T2 = T_out, T3 = T_in, T_m = (T_out + T_in) / 2.0;
+  var C_cond, C_rad, C_gap, R_tot, q;
+  for (var i=0; i<50; i++) {
+    T_m = (T2 + T3) / 2.0;
+    C_cond = vigCalcGas(P, T_m, alpha, gamma, Mgas);
+    C_rad  = vigCalcRadFromMean(e2, e3, T_m);
+    C_gap  = C_cond + C_pa + C_rad;
+    R_tot  = R_o + tg1/kg1 + 1.0/C_gap + tg2/kg2 + R_i;
+    q  = (T_in-T_out)/R_tot;
+    var T2_new = T_out + q*(R_o + tg1/kg1);
+    var T3_new = T_in  - q*(R_i + tg2/kg2);
+    if (Math.abs(T2_new-T2) < 0.01 && Math.abs(T3_new-T3) < 0.01) {
+      T2 = T2_new; T3 = T3_new; T_m = (T2 + T3) / 2.0; break;
+    }
+    T2 = T2_new; T3 = T3_new;
+  }
+  var U_aa = 1.0/R_tot;
+  return {
+    U_air_to_air:         Math.round(U_aa*10000)/10000,
+    U_surface_to_surface: Math.round(C_gap*10000)/10000,
+    R_value:              Math.round((1.0/U_aa)*10000)/10000,
+    C_pa:   Math.round(C_pa*1000000)/1000000,
+    C_rad:  Math.round(C_rad*1000000)/1000000,
+    C_cond: Math.round(C_cond*1000000)/1000000
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PLOT BLOCK PARSER + CHART RENDERER
+   ═══════════════════════════════════════════════════════════════ */
+// Colours are perceptually distinct even for 2-dataset plots (the first two match
+// the site's green palette), then step out to blue, orange, purple and red so
+// that 3+ series are immediately discernible — including for colour-blind viewers.
+var CHART_COLORS = [
+  "#1f4d3a",  // deep green   (series 1)
+  "#e07b24",  // amber/orange (series 2)
+  "#2176ae",  // steel blue   (series 3)
+  "#b5202a",  // brick red    (series 4)
+  "#7b3fa0",  // purple       (series 5)
+  "#2f6b52",  // mid green    (series 6 – back to palette for very long lists)
+  "#c8a400",  // gold         (series 7)
+  "#0a7c8c"   // teal         (series 8)
+];
+
+// Distinct Chart.js pointStyle values — one per series.
+// "circle" is the default; subsequent entries use geometric shapes so
+// datasets are still separable in black-and-white or printed output.
+var CHART_MARKERS = [
+  "circle",       // series 1
+  "rect",         // series 2  (square)
+  "triangle",     // series 3
+  "rectRot",      // series 4  (diamond)
+  "star",         // series 5
+  "cross",        // series 6
+  "crossRot",     // series 7  (×)
+  "rectRounded"   // series 8
+];
+var vigChartInstances = {};
+
+function extractPlotPayload(text) {
+  if (!text) return null;
+  var idx = text.indexOf("PLOT:");
+  if (idx === -1) return null;
+  var s = text.substring(idx + 5).trim();
+  s = s.replace(/^```(?:json)?/i,"").replace(/```$/i,"").trim();
+  var start = s.indexOf("{");
+  if (start === -1) return null;
+  var depth=0, end=-1;
+  for (var i=start; i<s.length; i++) {
+    if (s[i]==="{") depth++;
+    else if (s[i]==="}") { depth--; if(depth===0){end=i;break;} }
+  }
+  if (end===-1) return null;
+  try { return JSON.parse(s.substring(start, end+1)); } catch(e) { return null; }
+}
+
+function stripPlotPayload(text) {
+  if (!text) return "";
+  var idx = text.indexOf("PLOT:");
+  return (idx === -1) ? text.trim() : text.substring(0, idx).trim();
+}
+
+function vigRunPlot(spec) {
+  // Params that belong at the top level of the calc object, not inside pillar_params
+  var TOP_LEVEL = {"S_p":1,"epsilon2":1,"epsilon3":1,"P":1,
+                   "R_o":1,"R_i":1,"h_o":1,"h_i":1,
+                   "T_out":1,"T_in":1,"t_g1":1,"t_g2":1,"k_g1":1,"k_g2":1};
+  var xVals = [];
+  var step = (spec.x_max - spec.x_min) / (spec.x_steps - 1);
+  for (var i=0; i<spec.x_steps; i++) {
+    xVals.push(Math.round((spec.x_min + i*step)*1e6)/1e6);
+  }
+  var datasets = spec.series.map(function(series, si) {
+    var data = xVals.map(function(xv) {
+      var p = JSON.parse(JSON.stringify(series.base_params));
+      // Route swept value: known top-level params go on p directly;
+      // pillar geometry params go inside pillar_params
+      if (spec.x_in_pillar_params || !TOP_LEVEL[spec.x_param]) {
+        if (p.pillar_params) p.pillar_params[spec.x_param] = xv;
+      } else {
+        p[spec.x_param] = xv;
+      }
+      try {
+        var r = vigRunCalc(p);
+        var v = r[spec.y_metric];
+        return (v !== undefined && v !== null && isFinite(v)) ? v : null;
+      } catch(e) { return null; }
+    });
+    var color  = CHART_COLORS[si % CHART_COLORS.length];
+    var marker = CHART_MARKERS[si % CHART_MARKERS.length];
+    return {
+      label: series.label,
+      data: data,
+      borderColor: color,
+      backgroundColor: "transparent",
+      borderWidth: 2,
+      pointStyle: marker,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      tension: 0.35
+    };
+  });
+  var hasData = datasets.some(function(ds) {
+    return ds.data.some(function(v) { return v !== null; });
+  });
+  return { xVals: xVals, datasets: datasets, hasData: hasData };
+}
+
+function vigBuildHistoryTable(spec, result) {
+  // Build a plain-text markdown table of the sweep data for vigHistory
+  // so the model can reproduce it verbatim when asked for a table.
+  var seriesLabels = result.datasets.map(function(d){ return d.label; });
+  var header = "| " + spec.x_label + " | " + seriesLabels.join(" | ") + " |";
+  var divider = "| --- " + seriesLabels.map(function(){ return "| --- "; }).join("") + "|";
+  var rows = result.xVals.map(function(xv, i) {
+    var cells = seriesLabels.map(function(_, si) {
+      var v = result.datasets[si].data[i];
+      return v !== null ? v.toFixed(4) : "—";
+    });
+    return "| " + xv + " | " + cells.join(" | ") + " |";
+  });
+  return "Chart: " + spec.title + "\n" + spec.x_label + " vs " + spec.y_label + "\n\n" +
+         header + "\n" + divider + "\n" + rows.join("\n");
+}
+
+function vigRenderChart(spec, onDataReady) {
+  var chartId = "vigChart" + Date.now();
+  var card = '<div class="vig-chart-card">' +
+    '<div class="vig-chart-title">📈 ' + esc(spec.title) + '</div>' +
+    '<canvas class="vig-chart-canvas" id="' + chartId + '" height="300"></canvas>' +
+    '<div class="vig-chart-note">Computed client-side · NFRC boundary conditions</div>' +
+    '</div>';
+
+  var m = document.getElementById("vigMsgs");
+  m.insertAdjacentHTML("beforeend", card);
+  m.scrollTop = m.scrollHeight;
+
+  // Run the sweep after the canvas is in the DOM
+  setTimeout(function() {
+    var result = vigRunPlot(spec);
+    // Guard: if all values are null the spec was malformed — show an error instead of a blank chart
+    if (!result.hasData) {
+      var card = document.getElementById(chartId);
+      if (card) card.closest('.vig-chart-card').innerHTML =
+        '<div class="vig-chart-title" style="color:#c00;">⚠ Chart error — no data computed</div>' +
+        '<div style="font-size:13px;color:#66756d;margin-top:6px;">The plot parameters could not produce valid results. ' +
+        'Try rephrasing your request with more specific input details.</div>';
+      return;
+    }
+    // Store full numeric table in history so the model can reproduce it as a table on request
+    if (onDataReady) onDataReady(vigBuildHistoryTable(spec, result));
+    var ctx = document.getElementById(chartId).getContext("2d");
+    vigChartInstances[chartId] = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: result.xVals.map(function(v){ return v.toFixed ? v.toFixed(4) : v; }),
+        datasets: result.datasets
+      },
+      options: {
+        responsive: true,
+        interaction: { mode:"index", intersect:false },
+        plugins: {
+          legend: { position:"top", labels:{ usePointStyle:true, pointStyleWidth:12, font:{size:12} } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return ctx.dataset.label + ": " + (ctx.parsed.y !== null ? ctx.parsed.y.toFixed(4) : "—") + " " + spec.y_label.match(/\[(.+)\]/)?.[1] || "";
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display:true, text: spec.x_label, font:{size:12}, color:"#44524a" },
+            ticks: { maxTicksLimit:10, font:{size:11} }
+          },
+          y: {
+            title: { display:true, text: spec.y_label, font:{size:12}, color:"#44524a" },
+            ticks: { font:{size:11} }
+          }
+        }
+      }
+    });
+  }, 50);
+  return chartId;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THERMAL STRESS RESULT RENDERER
+   ═══════════════════════════════════════════════════════════════ */
+
+// Draw an inline SVG coordinate reference diagram for a panel of given dimensions.
+// Origin is bottom-left corner; x→right, y→up. Shows edge zone in grey, 
+// centre zone in white, corner marks and axis labels.
+function vigStressCoordDiagram(L_m, W_m, b_m, qx, qy) {
+  var W = 340, H = 200;
+  var PAD = 38;
+  var pw = W - PAD*2, ph = H - PAD*2;
+  // Scale factor
+  var scaleX = pw / L_m, scaleY = ph / W_m;
+  function px(x){ return PAD + x * scaleX; }
+  function py(y){ return PAD + ph - y * scaleY; } // flip so y=0 at bottom
+  var bpx = b_m * scaleX, bpy = b_m * scaleY;
+
+  var svg = '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;font-family:inherit">';
+
+  // Edge zone (full panel, grey)
+  svg += '<rect x="'+PAD+'" y="'+PAD+'" width="'+pw+'" height="'+ph+'" fill="#e8e0f0" stroke="#7b3fa0" stroke-width="1.5" rx="2"/>';
+  // Centre zone (white)
+  var cx=PAD+bpx, cy=PAD+bpy, cw=pw-2*bpx, ch=ph-2*bpy;
+  if(cw>0&&ch>0) svg += '<rect x="'+cx+'" y="'+cy+'" width="'+cw+'" height="'+ch+'" fill="#fff" stroke="#7b3fa0" stroke-width="1" stroke-dasharray="4,2"/>';
+
+  // Query point marker
+  if(qx!==undefined&&qy!==undefined){
+    var dotX=px(qx), dotY=py(qy);
+    svg += '<circle cx="'+dotX+'" cy="'+dotY+'" r="5" fill="#e07b24" stroke="#fff" stroke-width="1.5"/>';
+    svg += '<text x="'+(dotX+7)+'" y="'+(dotY+4)+'" font-size="9" fill="#e07b24" font-weight="700">('+qx.toFixed(3)+','+qy.toFixed(3)+')</text>';
+  }
+
+  // Origin marker
+  svg += '<circle cx="'+PAD+'" cy="'+(PAD+ph)+'" r="3" fill="#1f4d3a"/>';
+
+  // Axis labels
+  // X axis
+  svg += '<line x1="'+PAD+'" y1="'+(PAD+ph+10)+'" x2="'+(PAD+pw)+'" y2="'+(PAD+ph+10)+'" stroke="#44524a" stroke-width="1" marker-end="url(#arr)"/>';
+  svg += '<text x="'+(PAD+pw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="10" fill="#44524a">x → (0 to '+L_m+' m)</text>';
+  // Y axis
+  svg += '<line x1="'+(PAD-10)+'" y1="'+(PAD+ph)+'" x2="'+(PAD-10)+'" y2="'+PAD+'" stroke="#44524a" stroke-width="1" marker-end="url(#arr)"/>';
+  svg += '<text x="10" y="'+(PAD+ph/2)+'" text-anchor="middle" font-size="10" fill="#44524a" transform="rotate(-90,10,'+(PAD+ph/2)+')">y → (0 to '+W_m+' m)</text>';
+
+  // Corner labels
+  svg += '<text x="'+(PAD+2)+'" y="'+(PAD+ph-3)+'" font-size="8" fill="#7b3fa0">(0,0)</text>';
+  svg += '<text x="'+(PAD+pw-30)+'" y="'+(PAD+ph-3)+'" font-size="8" fill="#7b3fa0">(L,0)</text>';
+  svg += '<text x="'+(PAD+2)+'" y="'+(PAD+11)+'" font-size="8" fill="#7b3fa0">(0,W)</text>';
+  svg += '<text x="'+(PAD+pw-30)+'" y="'+(PAD+11)+'" font-size="8" fill="#7b3fa0">(L,W)</text>';
+
+  // Centre label
+  svg += '<text x="'+(PAD+pw/2)+'" y="'+(PAD+ph/2+4)+'" text-anchor="middle" font-size="9" fill="#44524a">centre zone</text>';
+
+  // Edge label
+  svg += '<text x="'+(PAD+bpx/2)+'" y="'+(PAD+ph/2+4)+'" text-anchor="middle" font-size="8" fill="#7b3fa0" transform="rotate(-90,'+(PAD+bpx/2)+','+(PAD+ph/2)+')">edge (b='+b_m+'m)</text>';
+
+  // Arrow marker def
+  svg += '<defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#44524a"/></marker></defs>';
+
+  svg += '</svg>';
+  return svg;
+}
+
+// Render a thermal stress SUMMARY result card
+function vigRenderStressSummary(r, baseParams) {
+  // Store params globally — safe key avoids all JSON/quote escaping in onclick
+  var pKey = 'sp' + Date.now();
+  VIG_STRESS_PARAMS[pKey] = baseParams;
+  var surfaces = r.requested_surfaces || [1];
+  var cs = r.centre_stresses_MPa || {};
+  var es = r.mid_edge_stresses_MPa || {};
+  var atm = r.atmospheric_prestress || {};
+
+  var html = '<div class="vig-stress-card">';
+  html += '<div class="vig-stress-card-title">🔬 Thermal Stress Result — '+esc(r.bc_label||r.bc)+'</div>';
+
+  // Hero: peak stress + deflection
+  html += '<div class="vig-stress-hero"><div class="vig-stress-hero-grid">';
+  html += '<div><div class="vig-stress-lbl">Peak thermal stress</div><div class="vig-stress-val">'+(r.peak_stress_MPa||0).toFixed(3)+'</div><div class="vig-stress-unit">MPa (surface '+r.peak_surface+', '+r.peak_region+')</div></div>';
+  html += '<div><div class="vig-stress-lbl">Centre deflection</div><div class="vig-stress-val">'+(r.centre_deflection_mm||0).toFixed(3)+'</div><div class="vig-stress-unit">mm</div></div>';
+  html += '<div><div class="vig-stress-lbl">Max deflection</div><div class="vig-stress-val">'+(r.max_deflection_mm||0).toFixed(3)+'</div><div class="vig-stress-unit">mm</div></div>';
+  html += '</div></div>';
+
+  // Centre and edge stresses table — only requested surface
+  html += '<table width="100%" style="border-collapse:collapse;font-size:12px;margin-bottom:10px;">';
+  html += '<tr><td style="color:#66756d;padding:3px 6px;"></td><td style="color:#66756d;font-weight:700;text-align:center;padding:3px 6px;">Centre (MPa)</td><td style="color:#66756d;font-weight:700;text-align:center;padding:3px 6px;">Mid-edge (MPa)</td></tr>';
+  surfaces.forEach(function(s){
+    var sn = s==1?'Surface 1 (outer face, pane 1 — colder side)':'Surface 4 (outer face, pane 2 — warmer side)';
+    // Use flat MPa dicts (cs/es) if available, otherwise fall back to full objects
+    var csVal = cs[String(s)];
+    var esVal = es[String(s)];
+    if(typeof csVal === 'object' && csVal !== null) csVal = csVal.sigma_1_MPa;
+    if(typeof esVal === 'object' && esVal !== null) esVal = esVal.sigma_1_MPa;
+    html += '<tr><td style="color:#22302a;padding:3px 6px;font-weight:600;">'+sn+'</td>';
+    html += '<td style="text-align:center;padding:3px 6px;font-weight:600;color:#7b3fa0;">'+(csVal!==undefined?Number(csVal).toFixed(3):'—')+'</td>';
+    html += '<td style="text-align:center;padding:3px 6px;font-weight:600;color:#7b3fa0;">'+(esVal!==undefined?Number(esVal).toFixed(3):'—')+'</td></tr>';
+  });
+  html += '</table>';
+
+  // Atmospheric prestress section — with relative contributions
+  if(atm && atm.S1_outer_above_pillar_MPa!==undefined) {
+    // Collect all stress magnitudes for relative bar display
+	  var atmComponents = [
+	    {label:'S1 outer above pillar (tensile)', val:atm.S1_outer_above_pillar_MPa || 0, note:'pane 1'},
+	    {label:'S2 inner between pillars (tensile)', val:atm.S2_inner_between_pillars_MPa || 0, note:'pane 1'},
+	    {label:'S4 outer above pillar (tensile)', val:atm.S4_outer_above_pillar_MPa || 0, note:'pane 2'},
+	    {label:'S3 inner between pillars (tensile)', val:atm.S3_inner_between_pillars_MPa || 0, note:'pane 2'},
+	    {label:'Edge seal bending stress', val:atm.edge_seal_bending_MPa || 0, note:''},
+	  ];
+    var atmMax = Math.max.apply(null, atmComponents.map(function(c){return c.val;}));
+    var spDef = atm.S_p_defaulted ? ' <span style="color:#e07b24;font-size:10px;">(default)</span>' : '';
+    var rpDef = atm.r_p_defaulted ? ' <span style="color:#e07b24;font-size:10px;">(default)</span>' : '';
+    html += '<div class="vig-stress-atm">';
+    html += '<div class="vig-stress-atm-title">Atmospheric prestress (permanent vacuum load)</div>';
+    html += '<div style="font-size:11px;color:#66756d;margin-bottom:8px;">Pillar spacing S_p = '+atm.S_p_used_m+' m'+spDef+' &nbsp;|&nbsp; Pillar radius r_p = '+atm.r_p_used_m+' m'+rpDef+'</div>';
+    atmComponents.forEach(function(c){
+      var pct = atmMax > 0 ? (c.val/atmMax*100) : 0;
+      html += '<div class="d-bar" style="margin-bottom:7px;">';
+      html += '<div class="d-barlbl"><span>'+c.label+'</span><strong>'+c.val.toFixed(3)+' MPa</strong></div>';
+      html += '<div class="d-trk"><div class="d-fill" style="width:'+pct.toFixed(1)+'%;background:#7b3fa0;"></div></div>';
+      html += '</div>';
+    });
+    html += '<div style="margin-top:8px;font-size:12px;">';
+    html += '<span style="color:#66756d;">Pillar compressive load: </span>';
+    html += '<strong style="color:#22302a;">'+atm.pillar_compressive_GPa.toFixed(3)+' GPa '+(atm.pillar_compressive_ok?'<span style="color:#1f4d3a;">✓ safe</span>':'<span style="color:#c00;">⚠ high</span>')+'</strong>';
+    html += ' &nbsp;('+atm.pillar_force_N.toFixed(1)+' N per pillar)';
+    html += '</div>';
+    html += '</div>'; // end atm
+  }
+
+  // Coordinate diagram
+  html += '<hr class="vig-stress-divider"/>';
+  html += '<div class="vig-coord-diagram">';
+  html += '<div style="font-size:11px;font-weight:700;color:#7b3fa0;margin-bottom:4px;">Panel coordinate system</div>';
+  html += '<div style="font-size:11px;color:#66756d;margin-bottom:6px;">Origin (0,0) = bottom-left corner of the pane. x runs left→right (0 to L='+r.L_m+' m), y runs bottom→top (0 to W='+r.W_m+' m). Centre = ('+( r.L_m/2).toFixed(3)+', '+(r.W_m/2).toFixed(3)+') m.</div>';
+  html += vigStressCoordDiagram(r.L_m, r.W_m, r.b_m);
+  html += '<div style="font-size:11px;color:#66756d;margin-top:5px;">Purple border = edge zone (b='+r.b_m+' m, beam model) &nbsp;|&nbsp; White = plate region (2D plate theory) &nbsp;|&nbsp; Surface 1 = outer face of pane 1 (colder), Surface 4 = outer face of pane 2</div>';
+  html += '</div>';
+
+  // Interactive query panel — clearly separated point vs line
+  html += '<div class="vig-stress-query-panel" id="sqp_'+Date.now()+'">';
+  html += '<div class="vig-stress-query-title">Query stress at a specific point or plot a line profile</div>';
+
+  // Point query
+  html += '<div style="background:#f5f0fb;border-radius:7px;padding:10px 12px;margin-bottom:10px;">';
+  html += '<div style="font-size:12px;font-weight:700;color:#7b3fa0;margin-bottom:6px;">📍 Single-point stress query</div>';
+  html += '<div style="font-size:11px;color:#66756d;margin-bottom:6px;">Enter the (x, y) coordinates of the point you want. The stress at that single location will be returned. Example: centre = ('+( r.L_m/2).toFixed(3)+', '+(r.W_m/2).toFixed(3)+'), left mid-edge = (0, '+(r.W_m/2).toFixed(3)+').</div>';
+  var ptId = 'spq'+Date.now();
+  html += '<div class="vig-stress-query-row">';
+  html += '<div class="vig-stress-query-field"><label>x [m] <span style="color:#7fa88c;font-weight:400;">(0 – '+r.L_m+')</span></label><input type="number" id="'+ptId+'_x" value="'+(r.L_m/2).toFixed(3)+'" min="0" max="'+r.L_m+'" step="0.001"/></div>';
+  html += '<div class="vig-stress-query-field"><label>y [m] <span style="color:#7fa88c;font-weight:400;">(0 – '+r.W_m+')</span></label><input type="number" id="'+ptId+'_y" value="'+(r.W_m/2).toFixed(3)+'" min="0" max="'+r.W_m+'" step="0.001"/></div>';
+  html += '<button class="vig-stress-query-btn" onclick="vigStressPointQuery(\''+ptId+'\',\''+pKey+'\')">Get stress at point</button>';
+  html += '</div>';
+  html += '<div id="'+ptId+'_result" style="font-size:12px;margin-top:6px;"></div>';
+  html += '</div>'; // end point box
+
+  // Line profile
+  html += '<div style="background:#eef6f0;border-radius:7px;padding:10px 12px;">';
+  html += '<div style="font-size:12px;font-weight:700;color:#1f4d3a;margin-bottom:6px;">📈 Stress profile along a line</div>';
+  html += '<div style="font-size:11px;color:#66756d;margin-bottom:6px;">Define start and end coordinates for a line across the panel. A chart of stress variation along that path will appear in the main window below. Example: horizontal centreline → (0, '+(r.W_m/2).toFixed(3)+') to ('+r.L_m+', '+(r.W_m/2).toFixed(3)+').</div>';
+  var prId = 'spr'+Date.now();
+  html += '<div class="vig-stress-query-row">';
+  html += '<div class="vig-stress-query-field"><label>Start x₀ [m]</label><input type="number" id="'+prId+'_x0" value="0" min="0" max="'+r.L_m+'" step="0.001"/></div>';
+  html += '<div class="vig-stress-query-field"><label>Start y₀ [m]</label><input type="number" id="'+prId+'_y0" value="'+(r.W_m/2).toFixed(3)+'" min="0" max="'+r.W_m+'" step="0.001"/></div>';
+  html += '<div style="align-self:center;font-weight:700;color:#1f4d3a;padding-bottom:2px;font-size:16px;">→</div>';
+  html += '<div class="vig-stress-query-field"><label>End x₁ [m]</label><input type="number" id="'+prId+'_x1" value="'+r.L_m+'" min="0" max="'+r.L_m+'" step="0.001"/></div>';
+  html += '<div class="vig-stress-query-field"><label>End y₁ [m]</label><input type="number" id="'+prId+'_y1" value="'+(r.W_m/2).toFixed(3)+'" min="0" max="'+r.W_m+'" step="0.001"/></div>';
+  html += '<button id="'+prId+'_btn" class="vig-stress-query-btn green" onclick="vigStressLineProfile(\''+prId+'\',\''+pKey+'\')">Plot line profile</button>';
+  html += '</div>';
+  html += '<div style="font-size:11px;color:#7fa88c;margin-top:4px;">The line profile chart will appear in the main chat window.</div>';
+  html += '</div>'; // end line box
+
+  html += '</div>'; // end query panel
+
+  // ── Failure Assessment Section ────────────────────────────────────────
+  var fa = r.failure_assessment;
+  if(fa && (fa.thermal || fa.atmospheric)) {
+    html += '<div class="vig-fa-section">';
+    html += '<div class="vig-fa-title">🛡 Failure Assessment</div>';
+    html += '<div class="vig-fa-grid">';
+
+    // var expression (not function declaration) — works reliably in all JS environments
+    var faBox = function(label, fa_result) {
+      if(!fa_result) return '';
+
+      // Special case: peak thermal stress was compressive — show a note, no probability
+      if(fa_result.compressive_only) {
+        return '<div class="vig-fa-box">'
+          + '<div class="vig-fa-box-title">'+esc(label)+'</div>'
+          + '<div style="font-size:10px;color:#66756d;margin-bottom:6px;">'+esc(fa_result.source||'')+'</div>'
+          + '<div style="background:#eef6f0;border-radius:6px;padding:8px 10px;font-size:11px;color:#1f4d3a;line-height:1.5;">'
+          + '✓ Peak thermal stress is compressive ('+fa_result.sigma_max_MPa+' MPa).<br>'
+          + 'No tensile fracture risk from thermal loading at this location.'
+          + '</div>'
+          + '</div>';
+      }
+
+      var ct = fa_result.check_type;
+      var h = '<div class="vig-fa-box">';
+      h += '<div class="vig-fa-box-title">'+esc(label)+'</div>';
+      h += '<div style="font-size:10px;color:#66756d;margin-bottom:5px;">'+esc(fa_result.source||'')+'</div>';
+      h += '<div style="font-size:11px;color:#44524a;margin-bottom:4px;">';
+      h += 'σ_max: <strong>'+fa_result.sigma_max_MPa+' MPa</strong>';
+      if(fa_result.sigma_min_MPa !== undefined && fa_result.sigma_min_MPa !== fa_result.sigma_max_MPa)
+        h += '  |  σ_min: <strong>'+fa_result.sigma_min_MPa+' MPa</strong>';
+      h += '  |  Area: '+(fa_result.area_m2!=null?Number(fa_result.area_m2).toFixed(3):'—')+' m²</div>';
+      h += '<div style="font-size:10px;color:#7fa88c;margin-bottom:6px;">Duration: '+esc(fa_result.duration_label||'—')+'  |  k<sub>mod</sub> = '+(fa_result.k_mod||'—')+'</div>';
+
+      // Stress limit block
+      var sl = fa_result.stress_limit;
+      if(sl) {
+        h += '<div class="vig-fa-badge '+(sl.passed?'pass':'fail')+'">'+sl.result_label+'</div>';
+        h += '<div class="vig-fa-row"><span>Effective allowable</span><span>'+sl.effective_allowable_MPa+' MPa</span></div>';
+        h += '<div class="vig-fa-row"><span>Peak stress</span><span>'+sl.peak_stress_MPa+' MPa</span></div>';
+        if(sl.margin_pct!==null&&sl.margin_pct!==undefined) h += '<div class="vig-fa-row"><span>Margin</span><span style="color:'+(sl.passed?'#1b5e20':'#c00020')+';">'+(sl.margin_pct>0?'+':'')+sl.margin_pct+'%</span></div>';
+        h += '<div style="font-size:10px;color:#7fa88c;margin-top:3px;">Long-term allow.: '+sl.allowable_lt_MPa+' MPa  |  Short-term: '+sl.allowable_st_MPa+' MPa</div>';
+      }
+
+      // Failure probability block
+      var fp = fa_result.failure_probability;
+      if(fp) {
+        if(sl) h += '<hr style="border:none;border-top:1px solid #e3ece5;margin:7px 0;"/>';
+        h += '<div style="font-size:10px;color:#66756d;margin-bottom:2px;">'+esc(fp.weibull_label)+'  |  c = '+fp.biaxial_factor_c+'</div>';
+        if(ct === 'failure_probability' || ct === 'both') {
+          h += '<div class="vig-fa-pf-label">P<sub>f</sub> instantaneous</div>';
+          h += '<div class="vig-fa-pf-val">'+esc(fp.pf_instantaneous_fmt)+'</div>';
+          h += '<div class="vig-fa-interp">'+esc(fp.interp_instantaneous)+'</div>';
+          if(fa_result.is_long_term) {
+            h += '<div class="vig-fa-pf-label" style="margin-top:6px;">P<sub>f</sub> long-term (delayed fracture)</div>';
+            h += '<div class="vig-fa-pf-val">'+esc(fp.pf_longterm_fmt)+'</div>';
+            h += '<div class="vig-fa-interp">'+esc(fp.interp_longterm)+'</div>';
+            h += '<div style="font-size:9px;color:#7fa88c;margin-top:3px;">K<sub>Ic</sub>/K<sub>Iscc</sub> = '+fp.K_ratio+' ('+esc(fa_result.environment||'')+')</div>';
+          }
+        }
+      }
+      h += '</div>';
+      return h;
+    };
+
+    if(fa.thermal)     html += faBox('Thermal stress', fa.thermal);
+    if(fa.atmospheric) html += faBox('Atmospheric prestress', fa.atmospheric);
+
+    html += '</div>'; // end fa-grid
+    if(fa.note) html += '<div class="vig-fa-note">'+esc(fa.note)+'</div>';
+    html += '</div>'; // end fa-section
+  }
+
+  html += '</div>'; // end stress card
+
+  return html;
+}
+
+// Render a standalone glass_failure result card (from agent chat)
+function vigRenderFailureCard(r) {
+  var ct  = r.check_type || 'both';
+  var sl  = r.stress_limit;
+  var fp  = r.failure_probability;
+
+  var html = '<div class="vig-stress-card">';
+  html += '<div class="vig-stress-card-title">🛡 Glass Failure Assessment — '+esc(r.source||'glass surface')+'</div>';
+
+  // Input summary hero
+  html += '<div style="background:#f0f7f3;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px;">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
+  html += '<div><div style="color:#66756d;font-size:10px;">σ_max</div><div style="font-weight:700;color:#1f4d3a;font-size:15px;">'+r.sigma_max_MPa+' <span style="font-size:11px;font-weight:400;">MPa</span></div></div>';
+  html += '<div><div style="color:#66756d;font-size:10px;">σ_min</div><div style="font-weight:700;color:#1f4d3a;font-size:15px;">'+r.sigma_min_MPa+' <span style="font-size:11px;font-weight:400;">MPa</span></div></div>';
+  html += '<div><div style="color:#66756d;font-size:10px;">Area</div><div style="font-weight:700;color:#1f4d3a;font-size:15px;">'+r.area_m2+' <span style="font-size:11px;font-weight:400;">m²</span></div></div>';
+  html += '</div>';
+  html += '<div style="color:#7fa88c;margin-top:6px;font-size:11px;">Duration: '+esc(r.duration_label)+'  |  k_mod = '+r.k_mod+'  |  '+esc(r.environment)+'</div>';
+  html += '</div>';
+
+  // Stress limit block
+  if(sl) {
+    var passColour = sl.passed ? '#1b5e20' : '#c00020';
+    var passBg     = sl.passed ? '#d4edda'  : '#fde8e8';
+    html += '<div style="background:'+passBg+';border-radius:8px;padding:10px 14px;margin-bottom:10px;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+    html += '<span style="font-weight:800;font-size:13px;color:'+passColour+';">'+sl.result_label+'</span>';
+    html += '<span style="font-size:11px;color:'+passColour+';">Deterministic stress limit check</span>';
+    html += '</div>';
+    html += '<table width="100%" style="border-collapse:collapse;font-size:12px;">';
+    html += '<tr><td style="color:#44524a;padding:2px 0;">Effective allowable (k_mod = '+sl.k_mod+')</td><td style="font-weight:600;text-align:right;color:#22302a;">'+sl.effective_allowable_MPa+' MPa</td></tr>';
+    html += '<tr><td style="color:#44524a;padding:2px 0;">Peak stress</td><td style="font-weight:600;text-align:right;color:'+passColour+';">'+sl.peak_stress_MPa+' MPa</td></tr>';
+    if(sl.margin_pct!==null) html += '<tr><td style="color:#44524a;padding:2px 0;">Margin</td><td style="font-weight:700;text-align:right;color:'+passColour+';">'+(sl.margin_pct>0?'+':'')+sl.margin_pct+'%</td></tr>';
+    html += '</table></div>';
+  }
+
+  // Failure probability block
+  if(fp) {
+    html += '<div style="background:#f5f0fb;border-radius:8px;padding:10px 14px;">';
+    html += '<div style="font-size:11px;font-weight:700;color:#7b3fa0;margin-bottom:6px;">Weibull / Modified Crack Growth Model</div>';
+    html += '<div style="font-size:11px;color:#66756d;margin-bottom:8px;">'+esc(fp.weibull_label)+'  |  m = '+fp.m+'  |  Biaxial factor c = '+fp.biaxial_factor_c+'</div>';
+
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+
+    // Instantaneous Pf
+    html += '<div>';
+    html += '<div style="font-size:10px;color:#66756d;">P<sub>f</sub> instantaneous</div>';
+    html += '<div style="font-size:20px;font-weight:700;color:#7b3fa0;font-family:monospace;">'+esc(fp.pf_instantaneous_fmt)+'</div>';
+    html += '<div style="font-size:10px;color:#44524a;font-style:italic;line-height:1.4;">'+esc(fp.interp_instantaneous)+'</div>';
+    html += '</div>';
+
+    // Long-term Pf
+    if(r.is_long_term) {
+      html += '<div>';
+      html += '<div style="font-size:10px;color:#66756d;">P<sub>f</sub> long-term (delayed fracture)</div>';
+      html += '<div style="font-size:20px;font-weight:700;color:#7b3fa0;font-family:monospace;">'+esc(fp.pf_longterm_fmt)+'</div>';
+      html += '<div style="font-size:10px;color:#44524a;font-style:italic;line-height:1.4;">'+esc(fp.interp_longterm)+'</div>';
+      html += '<div style="font-size:9px;color:#7fa88c;margin-top:3px;">K<sub>Ic</sub>/K<sub>Iscc</sub> = '+fp.K_ratio+' ('+esc(r.environment)+')</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  html += '</div>'; // end card
+  return html;
+}
+
+// Render a stress POINT result inline (replaces result div)
+function vigStressPointResult(r, containerId, baseParams) {
+  var surfaces = r.requested_surfaces || [1];
+  var sr = r.surface_results || {};
+  var x = r.x_m, y = r.y_m;
+
+  var html = '<div style="background:#f5f0fb;border-radius:8px;padding:10px 12px;margin-top:6px;">';
+  html += '<div style="font-weight:700;color:#7b3fa0;margin-bottom:6px;">Stress at ('+x+', '+y+') m — '+esc(r.bc_label||r.bc)+'</div>';
+  html += '<table width="100%" style="border-collapse:collapse;font-size:12px;">';
+  surfaces.forEach(function(s){
+    var d = sr[String(s)];
+    if(!d) return;
+    var sn = s==1?'Surface 1 — outer face, pane 1 (colder)':'Surface 4 — outer face, pane 2';
+    html += '<tr><td style="color:#44524a;padding:2px 4px;font-weight:600;">'+sn+'</td>';
+    html += '<td style="padding:2px 4px;color:#66756d;">σ_xx</td><td style="font-weight:600;color:#7b3fa0;padding:2px 4px;">'+d.sigma_xx_MPa.toFixed(4)+' MPa</td>';
+    html += '<td style="padding:2px 4px;color:#66756d;">σ_yy</td><td style="font-weight:600;color:#7b3fa0;padding:2px 4px;">'+d.sigma_yy_MPa.toFixed(4)+' MPa</td>';
+    html += '<td style="padding:2px 4px;color:#66756d;">region</td><td style="padding:2px 4px;">'+d.region+'</td></tr>';
+  });
+  html += '</table>';
+  html += '<div style="font-size:11px;color:#66756d;margin-top:4px;">Centre deflection: '+(r.centre_deflection_mm||0).toFixed(4)+' mm</div>';
+  html += '</div>';
+
+  // Update diagram with the queried point
+  var diagDiv = document.querySelector('.vig-stress-card .vig-coord-diagram svg');
+  // Re-render diagram with point marked (find the closest card)
+  var card = document.getElementById(containerId);
+  if(card){
+    var diagContainer = card.parentNode.querySelector('.vig-coord-diagram');
+    if(diagContainer) {
+      // Find params from the latest stress result to re-draw with point
+      var L = baseParams.L || baseParams.L_m || 0.5;
+      var W = baseParams.W || baseParams.W_m || 0.5;
+      var b = baseParams.b || 0.005;
+      diagContainer.innerHTML = '<div style="font-size:11px;font-weight:700;color:#7b3fa0;margin-bottom:6px;">Panel coordinate system — queried point shown in orange</div>' +
+        vigStressCoordDiagram(L, W, b, x, y) +
+        '<div style="font-size:11px;color:#66756d;margin-top:5px;">Orange dot = your queried point ('+x+', '+y+') m</div>';
+    }
+  }
+
+  document.getElementById(containerId+'_result').innerHTML = html;
+}
+
+// Render a stress LINE PROFILE as a chart in the main message area
+function vigRenderStressProfile(r) {
+  var pd = r.profile_data || [];
+  if(!pd.length) return;
+  var surfaces = r.requested_surfaces || [1];
+  var isDisp = r.profile_quantity === 'displacement';
+
+  // Build arc-length labels
+  var x0 = pd[0].x_m, y0 = pd[0].y_m;
+  var labels = pd.map(function(pt){
+    var dx = pt.x_m - x0, dy = pt.y_m - y0;
+    return (Math.sqrt(dx*dx+dy*dy)*1000).toFixed(1)+' mm';
+  });
+
+  var STRESS_COLORS = ['#7b3fa0','#e07b24','#2176ae','#b5202a'];
+  var STRESS_MARKERS = ['circle','rect','triangle','rectRot'];
+  var datasets = [];
+
+  if(isDisp){
+    datasets.push({
+      label:'Deflection',
+      data: pd.map(function(pt){ return pt.displacement_mm; }),
+      borderColor:'#1f4d3a', backgroundColor:'transparent',
+      borderWidth:2, pointStyle:'circle', pointRadius:3, tension:0.3
+    });
+  } else {
+    surfaces.forEach(function(s, si){
+      datasets.push({
+        label:'Surface '+s,
+        data: pd.map(function(pt){ return pt['surface_'+s+'_MPa']; }),
+        borderColor: STRESS_COLORS[si%STRESS_COLORS.length],
+        backgroundColor:'transparent',
+        borderWidth:2,
+        pointStyle: STRESS_MARKERS[si%STRESS_MARKERS.length],
+        pointRadius:3, tension:0.3
+      });
+    });
+  }
+
+  var chartId = 'vigStressChart'+Date.now();
+  var yLabel = isDisp ? 'Deflection [mm]' : 'Stress magnitude [MPa]';
+  var title = isDisp ? 'Deflection profile along line' : 'Thermal stress profile along line';
+  var startPt = r.line_start_m ? r.line_start_m : [pd[0].x_m, pd[0].y_m];
+  var endPt   = r.line_end_m   ? r.line_end_m   : [pd[pd.length-1].x_m, pd[pd.length-1].y_m];
+
+  var card = '<div class="vig-stress-card" style="border-left-color:#7b3fa0;">' +
+    '<div class="vig-stress-card-title">📈 '+esc(title)+'</div>' +
+    '<div style="font-size:11px;color:#66756d;margin-bottom:8px;">Line: ('+startPt[0]+', '+startPt[1]+') → ('+endPt[0]+', '+endPt[1]+') m &nbsp;|&nbsp; BC: '+esc(r.bc_label||r.bc)+'</div>' +
+    '<canvas class="vig-chart-canvas" id="'+chartId+'" height="300"></canvas>' +
+    '<div class="vig-chart-note">x-axis = distance along line from start point</div>' +
+    '</div>';
+
+  var m = document.getElementById('vigMsgs');
+  m.insertAdjacentHTML('beforeend', card);
+  m.scrollTop = m.scrollHeight;
+
+  setTimeout(function(){
+    var ctx = document.getElementById(chartId);
+    if(!ctx) return;
+    new Chart(ctx.getContext('2d'), {
+      type:'line',
+      data:{ labels:labels, datasets:datasets },
+      options:{
+        responsive:true,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{position:'top',labels:{usePointStyle:true,pointStyleWidth:12,font:{size:12}}},
+          tooltip:{
+            callbacks:{
+              label:function(ctx){ return ctx.dataset.label+': '+(ctx.parsed.y!==null?ctx.parsed.y.toFixed(4):'—')+' '+(isDisp?'mm':'MPa'); }
+            }
+          },
+          title:{display:true,text:title,font:{size:13},color:'#7b3fa0'}
+        },
+        scales:{
+          x:{title:{display:true,text:'Distance along line [mm]',font:{size:12},color:'#44524a'},ticks:{maxTicksLimit:12,font:{size:11}}},
+          y:{title:{display:true,text:yLabel,font:{size:12},color:'#44524a'},ticks:{font:{size:11}}}
+        }
+      }
+    });
+  }, 50);
+
+  return chartId;
+}
+
+var VIG_STRESS_PARAMS = {}; // keyed by unique id, avoids onclick JSON escaping issues
+
+function vigStressPointQuery(ptId, paramsOrKey) {
+  var xEl = document.getElementById(ptId+'_x');
+  var yEl = document.getElementById(ptId+'_y');
+  if(!xEl||!yEl) return;
+  var x = parseFloat(xEl.value), y = parseFloat(yEl.value);
+  if(isNaN(x)||isNaN(y)){alert('Please enter valid x and y coordinates.');return;}
+  var resEl = document.getElementById(ptId+'_result');
+  if(resEl) resEl.innerHTML = '<span style="color:#7fa88c;font-size:12px;">Computing…</span>';
+
+  var baseParams = (typeof paramsOrKey==='string') ? VIG_STRESS_PARAMS[paramsOrKey] : paramsOrKey;
+  if(!baseParams){if(resEl)resEl.innerHTML='<span style="color:#c00;font-size:12px;">Error: params not found</span>';return;}
+  var params = JSON.parse(JSON.stringify(baseParams));
+  params.output_mode = 'point';
+  params.x = x;
+  params.y = y;
+
+  fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({question:'DIRECT_CALC',calc_params:params})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.calculation && !d.calculation.error) {
+      vigStressPointResult(d.calculation, ptId, baseParams);
+    } else {
+      if(resEl) resEl.innerHTML = '<span style="color:#c00;font-size:12px;">Error: '+(d.calculation?d.calculation.error:(d.error||'Unknown'))+'</span>';
+    }
+  })
+  .catch(function(e){ if(resEl) resEl.innerHTML='<span style="color:#c00;font-size:12px;">'+esc(e.toString())+'</span>'; });
+}
+
+// Handler for the line profile button in the stress card
+function vigStressLineProfile(prId, paramsOrKey) {
+  var x0 = parseFloat(document.getElementById(prId+'_x0').value);
+  var y0 = parseFloat(document.getElementById(prId+'_y0').value);
+  var x1 = parseFloat(document.getElementById(prId+'_x1').value);
+  var y1 = parseFloat(document.getElementById(prId+'_y1').value);
+  if([x0,y0,x1,y1].some(isNaN)){alert('Please enter valid start and end coordinates.');return;}
+
+  var btn = document.getElementById(prId+'_btn');
+  if(btn){btn.disabled=true;btn.textContent='Computing…';}
+
+  var baseParams = (typeof paramsOrKey==='string') ? VIG_STRESS_PARAMS[paramsOrKey] : paramsOrKey;
+  if(!baseParams){alert('Error: params not found');return;}
+  var params = JSON.parse(JSON.stringify(baseParams));
+  params.output_mode = 'profile';
+  params.x0 = x0; params.y0 = y0;
+  params.x1 = x1; params.y1 = y1;
+  params.n_points = 51;
+
+  fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({question:'DIRECT_CALC',calc_params:params})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(btn){btn.disabled=false;btn.textContent='Plot line profile';}
+    if(d.calculation && !d.calculation.error) {
+      vigRenderStressProfile(d.calculation);
+      var m = document.getElementById('vigMsgs');
+      m.scrollTop = m.scrollHeight;
+      vigHistory.push({role:'user',content:'[User plotted stress profile from ('+x0+','+y0+') to ('+x1+','+y1+') m]'});
+      vigHistory.push({role:'assistant',content:'Stress profile plotted along line from ('+x0+','+y0+') to ('+x1+','+y1+') m.'});
+    } else {
+      alert('Profile error: '+(d.calculation?d.calculation.error:(d.error||'Unknown error')));
+    }
+  })
+  .catch(function(e){
+    if(btn){btn.disabled=false;btn.textContent='Plot line profile';}
+    alert('Error: '+e.toString());
+  });
+}
+
+</script>
+
+<!-- VIG Application -->
+<script>
+
+/* ═══ CONFIG ═══ */
+var API = "https://3ulwio3s4h.execute-api.us-east-1.amazonaws.com/prod/ask";
+var vigStep=1, vigGeom=null, vigMode=null;
+var vigLastResult=null, vigLastParams=null;
+var vigHistory=[], vigBusy=false;
+
+var GEOMS = {
+  cylindrical:    {name:"Cylindrical",    desc:"Standard disc",     fields:[{id:"r",label:"Radius r [m]",hint:"e.g. 0.00025",def:"0.00025"},{id:"h",label:"Height h [m]",hint:"e.g. 0.0002",def:"0.0002"},{id:"k_pillar",label:"k_pillar [W/mK]",hint:"Steel≈15, ceramic≈2",def:"15.0"}]},
+  polygon:        {name:"Polygon",        desc:"Square/hex",        fields:[{id:"A_contact",label:"Contact area [m²]",hint:"e.g. 1.96e-7",def:"1.96e-7"},{id:"h",label:"Height h [m]",hint:"",def:"0.0002"},{id:"k_pillar",label:"k_pillar [W/mK]",hint:"",def:"15.0"}]},
+  linear_bearing: {name:"Linear bearing",desc:"Cylinder on side",   fields:[{id:"L",label:"Length L [m]",hint:"Long dimension",def:"0.001"},{id:"W",label:"Width W [m]",hint:"Short dimension",def:"0.0001"},{id:"h",label:"Height h [m]",hint:"Diameter",def:"0.0001"},{id:"k_pillar",label:"k_pillar [W/mK]",hint:"",def:"15.0"}]},
+  truncated_cone: {name:"Truncated cone",desc:"Printed/sintered",   fields:[{id:"r1",label:"Bottom r1 [m]",hint:"Pane 1 side",def:"0.0003"},{id:"r2",label:"Top r2 [m]",hint:"Pane 2 side",def:"0.0002"},{id:"h",label:"Height h [m]",hint:"",def:"0.0002"},{id:"k_pillar",label:"k_pillar [W/mK]",hint:"",def:"2.0"}]},
+  annulus:        {name:"Annulus",        desc:"Ring-shaped",       fields:[{id:"r_i",label:"Inner r_i [m]",hint:"",def:"0.0001"},{id:"r_o",label:"Outer r_o [m]",hint:"",def:"0.00025"},{id:"h",label:"Height h [m]",hint:"",def:"0.0002"},{id:"k_pillar",label:"k_pillar [W/mK]",hint:"",def:"15.0"}]},
+  c_shaped:       {name:"C-shaped",      desc:"Partial annulus",   fields:[{id:"r_i",label:"Inner r_i [m]",hint:"",def:"0.0001"},{id:"r_o",label:"Outer r_o [m]",hint:"",def:"0.00025"},{id:"f",label:"Fraction f",hint:"0 to 1",def:"0.7"},{id:"h",label:"Height h [m]",hint:"",def:"0.0002"},{id:"k_pillar",label:"k_pillar [W/mK]",hint:"",def:"15.0"}]}
+};
+
+/* ═══ CHAT ═══ */
+function vigKD(e){ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();vigSend();} }
+function vigAS(el){ el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,140)+"px"; }
+function vigQuick(b){
+  var q = b.textContent.trim();
+  vigSendMsg(q);
+}
+function vigNewChat(){
+  vigHistory=[];
+  document.getElementById("vigMsgs").innerHTML='<div class="vig-welcome"><h2>Welcome to the VIG AI Agent</h2><p>This trial assistant helps answer technical questions about Vacuum Insulated Glass in a clear and practical way.</p><p style="text-align:left;margin-top:10px;margin-bottom:0;">Ask about thermal performance, support pillars, coatings, vacuum quality, residual gases, edge sealing, manufacturing, standards, or comparison with IGU and triple glazing.</p></div>';
+}
+
+function vigSend(){
+  var inp = document.getElementById("vigIn"), q = inp.value.trim();
+  if (!q || vigBusy) return;
+  inp.value = "";
+  inp.style.height = "auto";
+  vigSendMsg(q);
+}
+
+function normalizeCalcParams(params) {
+  if (!params) return params;
+
+  // ── Helper: first defined value among a list of candidate keys ──
+  function pick(obj) {
+    var keys = Array.prototype.slice.call(arguments, 1);
+    for (var i = 0; i < keys.length; i++) {
+      if (obj[keys[i]] !== undefined) return obj[keys[i]];
+    }
+    return undefined;
+  }
+
+  // ── Normalise pillar_params if present ──
+  if (params.pillar_params) {
+    var pp = params.pillar_params;
+    var t  = params.pillar_type;
+
+    if (t === "truncated_cone") {
+      // r1 = bottom/base radius — AI may say r_base, r_bottom, r1, r_large, r_big
+      var r1 = pick(pp, "r1", "r_base", "r_bottom", "r_large", "r_big", "radius_base", "radius_bottom", "radius1", "base_radius", "bottom_radius");
+      // r2 = top radius — AI may say r_top, r2, r_small, r_apex, r_min
+      var r2 = pick(pp, "r2", "r_top", "r_small", "r_apex", "r_min", "radius_top", "top_radius", "radius2");
+      if (r1 !== undefined) pp.r1 = r1;
+      if (r2 !== undefined) pp.r2 = r2;
+      // Remove any aliases so only canonical names remain
+      ["r_base","r_bottom","r_large","r_big","radius_base","radius_bottom","radius1","base_radius","bottom_radius",
+       "r_top","r_small","r_apex","r_min","radius_top","top_radius","radius2"].forEach(function(k){ delete pp[k]; });
+    }
+
+    if (t === "cylindrical") {
+      // r — AI may say radius, r, rad
+      var r = pick(pp, "r", "radius", "rad", "r_pillar", "pillar_radius");
+      if (r !== undefined) pp.r = r;
+      ["radius","rad","r_pillar","pillar_radius"].forEach(function(k){ delete pp[k]; });
+    }
+
+    if (t === "linear_bearing") {
+      // L (long dimension) — AI may say l, length, L
+      var L = pick(pp, "L", "l", "length", "Length");
+      // W (short dimension) — AI may say w, width, W
+      var W = pick(pp, "W", "w", "width", "Width");
+      if (L !== undefined) pp.L = L;
+      if (W !== undefined) pp.W = W;
+      ["l","length","Length","w","width","Width"].forEach(function(k){ delete pp[k]; });
+    }
+
+    if (t === "annulus" || t === "c_shaped") {
+      // r_i — AI may say r_inner, inner_radius, ri
+      var ri = pick(pp, "r_i", "r_inner", "inner_radius", "ri", "r_in");
+      // r_o — AI may say r_outer, outer_radius, ro
+      var ro = pick(pp, "r_o", "r_outer", "outer_radius", "ro", "r_out");
+      if (ri !== undefined) pp.r_i = ri;
+      if (ro !== undefined) pp.r_o = ro;
+      ["r_inner","inner_radius","ri","r_in","r_outer","outer_radius","ro","r_out"].forEach(function(k){ delete pp[k]; });
+    }
+
+    if (t === "polygon") {
+      // A_contact — AI may say area, contact_area, A, a_contact
+      var A = pick(pp, "A_contact", "area", "contact_area", "A", "a_contact", "a");
+      if (A !== undefined) pp.A_contact = A;
+      ["area","contact_area","A","a_contact","a"].forEach(function(k){ delete pp[k]; });
+    }
+
+    // h (height) — universal alias for all types
+    var h = pick(pp, "h", "height", "Height", "pillar_height", "thickness");
+    if (h !== undefined) pp.h = h;
+    ["height","Height","pillar_height","thickness"].forEach(function(k){ delete pp[k]; });
+
+    // k_pillar — AI may say k, k_p, conductivity, thermal_conductivity
+    var kp = pick(pp, "k_pillar", "k", "k_p", "conductivity", "thermal_conductivity", "k_material");
+    if (kp !== undefined) pp.k_pillar = kp;
+    ["k","k_p","conductivity","thermal_conductivity","k_material"].forEach(function(k){ delete pp[k]; });
+
+    // Remove any stray glass properties that should not be in pillar_params
+    ["k_glass1","k_glass2","k_g1","k_g2"].forEach(function(k){ delete pp[k]; });
+  }
+
+  // ── Normalise top-level glass / array params ──
+  // epsilon aliases
+  if (params.epsilon2 === undefined) {
+    params.epsilon2 = pick(params, "e2", "eps2", "emissivity2", "emissivity_2", "epsilon_2");
+  }
+  if (params.epsilon3 === undefined) {
+    params.epsilon3 = pick(params, "e3", "eps3", "emissivity3", "emissivity_3", "epsilon_3");
+  }
+
+  // S_p aliases
+  if (params.S_p === undefined) {
+    params.S_p = pick(params, "Sp", "sp", "s_p", "pillar_spacing", "spacing");
+  }
+
+  // Pressure aliases
+  if (params.P === undefined) {
+    params.P = pick(params, "p", "pressure", "vacuum_pressure");
+  }
+  if (params.alpha === undefined) { params.alpha = pick(params, "a", "accommodation", "accommodation_coefficient"); }
+  if (params.gamma === undefined) { params.gamma = pick(params, "g", "specific_heat_ratio"); }
+  if (params.M === undefined) { params.M = pick(params, "molecular_weight", "molar_mass", "mw"); }
+
+  return params;
+}
+
+function extractCalcPayload(text) {
+  if (!text) return null;
+
+  var idx = text.indexOf("CALCULATE:");
+  if (idx === -1) return null;
+
+  var s = text.substring(idx + "CALCULATE:".length).trim();
+
+  // Remove markdown fences if present
+  s = s.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+
+  var start = s.indexOf("{");
+  if (start === -1) return null;
+
+  var depth = 0;
+  var end = -1;
+  for (var i = start; i < s.length; i++) {
+    var ch = s[i];
+    if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        end = i;
+        break;
+      }
+    }
+  }
+
+  if (end === -1) return null;
+
+  var jsonText = s.substring(start, end + 1);
+
+  try {
+    return JSON.parse(jsonText);
+  } catch (e) {
+    console.error("Failed to parse CALCULATE payload:", e, jsonText);
+    return null;
+  }
+}
+
+function stripCalcPayload(text) {
+  if (!text) return "";
+  var idx = text.indexOf("CALCULATE:");
+  if (idx === -1) return text.trim();
+  return text.substring(0, idx).trim();
+}
+
+function runCalcPayload(params) {
+  params = normalizeCalcParams(params);
+
+  console.log("Normalized chat calc params:", params);
+
+  return fetch(API, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ question: "DIRECT_CALC", calc_params: params })
+  }).then(function(r) {
+    return r.text().then(function(txt) {
+      try {
+        return JSON.parse(txt);
+      } catch (e) {
+        console.error("Failed to parse calc response:", txt);
+        throw new Error("cannot parse response: " + txt.substring(0, 200));
+      }
+    });
+  });
+}
+// Safe DOM append — uses insertAdjacentHTML so existing canvas elements
+// (Chart.js plots) are never touched and their rendering context survives.
+function vigAppend(html) {
+  var m = document.getElementById("vigMsgs");
+  m.insertAdjacentHTML("beforeend", html);
+  m.scrollTop = m.scrollHeight;
+}
+
+function vigSendMsg(q){
+  if(!q||vigBusy)return;
+  vigBusy=true; document.getElementById("vigSendBtn").disabled=true;
+  var m=document.getElementById("vigMsgs");
+  vigAppend('<div class="vig-row user"><div class="vig-bubble">'+esc(q)+'</div></div>');
+  var tid="vt"+Date.now();
+  vigAppend('<div class="vig-row agent" id="'+tid+'"><div class="vig-bubble"><div class="vig-dots"><span></span><span></span><span></span></div></div></div>');
+  m.scrollTop=m.scrollHeight;
+  fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,history:vigHistory})})
+  .then(function(r){
+    return r.text().then(function(txt){
+      try {
+        return JSON.parse(txt);
+      } catch (e) {
+        console.error("Failed to parse chat response:", txt);
+        throw new Error("cannot parse response: " + txt.substring(0, 200));
+      }
+    });
+  })
+  
+  .then(function(d){
+    var el = document.getElementById(tid);
+    if (el) el.remove();
+
+    var rawAnswer = d.answer || "";
+    var extracted = extractCalcPayload(rawAnswer);
+    var plotSpec  = extractPlotPayload(rawAnswer);
+    var cleanAnswer = plotSpec
+      ? stripPlotPayload(rawAnswer)
+      : stripCalcPayload(rawAnswer);
+
+    if (cleanAnswer) {
+      vigAppend('<div class="vig-row agent"><div class="vig-bubble">' + fmt(cleanAnswer) + '</div></div>');
+    }
+
+    // Render chart if a PLOT block was returned
+    if (plotSpec) {
+      vigHistory.push({role:"user", content:q});
+      vigRenderChart(plotSpec, function(tableText) {
+        // Called once sweep data is computed — store full numeric table in history
+        vigHistory.push({role:"assistant", content:(cleanAnswer||"") + "\n\n" + tableText});
+      });
+      m.scrollTop = m.scrollHeight;
+      return;
+    }
+
+    vigHistory.push({role:"user", content:q});
+
+    if (d.calculation) {
+      // If backend calculation succeeded, show it normally
+      if (!d.calculation.error) {
+        // Stress profile goes to chart renderer, not calcCard
+        if(d.calculation.mode==='thermal_stress' && d.calculation.output_mode==='profile') {
+          vigRenderStressProfile(d.calculation);
+          vigHistory.push({role:"assistant", content:cleanAnswer + "\n\n" + calcTxt(d.calculation)});
+          m.scrollTop = m.scrollHeight;
+          return;
+        }
+        vigAppend(calcCard(d.calculation));
+
+        vigHistory.push({role:"assistant", content:cleanAnswer + "\n\n" + calcTxt(d.calculation)});
+        m.scrollTop = m.scrollHeight;
+        return;
+      }
+
+      // If backend calculation failed, but there is a CALCULATE payload in the answer,
+      // retry locally after normalization
+      if (extracted) {
+        runCalcPayload(extracted)
+          .then(function(calcResp){
+            if (calcResp.calculation && !calcResp.calculation.error) {
+              vigAppend(calcCard(calcResp.calculation));
+
+              vigHistory.push({role:"assistant", content:cleanAnswer + "\n\n" + calcTxt(calcResp.calculation)});
+            } else {
+              vigAppend(calcCard(d.calculation));
+
+              vigHistory.push({role:"assistant", content:cleanAnswer + "\n\nCalculation error: " + (d.calculation.error || "Unknown error")});
+            }
+            m.scrollTop = m.scrollHeight;
+          })
+          .catch(function(err){
+            vigAppend('<div class="vig-row agent"><div class="vig-bubble" style="color:#c00;">Calculation retry failed: ' + esc(err.message || err.toString()) + '</div></div>');
+
+            vigHistory.push({role:"assistant", content:cleanAnswer + "\n\nCalculation retry failed: " + (err.message || err.toString())});
+            m.scrollTop = m.scrollHeight;
+          });
+
+        return;
+      }
+
+      // No retry path available, show backend error
+      vigAppend(calcCard(d.calculation));
+
+      vigHistory.push({role:"assistant", content:cleanAnswer + "\n\nCalculation error: " + (d.calculation.error || "Unknown error")});
+      m.scrollTop = m.scrollHeight;
+      return;
+    }
+    if (rawAnswer.indexOf("CALCULATE:") !== -1 && !extracted) {
+      vigAppend('<div class="vig-row agent"><div class="vig-bubble" style="color:#c00;">Calculation error: unable to parse the generated calculation payload.</div></div>');
+
+      vigHistory.push({role:"assistant", content:cleanAnswer + "\n\nCalculation error: unable to parse the generated calculation payload."});
+      m.scrollTop = m.scrollHeight;
+      return;
+    }
+    if (extracted) {
+      runCalcPayload(extracted)
+        .then(function(calcResp){
+          if (calcResp.calculation) {
+            vigAppend(calcCard(calcResp.calculation));
+
+            vigHistory.push({role:"assistant", content:cleanAnswer + "\n\n" + calcTxt(calcResp.calculation)});
+          } else {
+            vigAppend('<div class="vig-row agent"><div class="vig-bubble" style="color:#c00;">Calculation error: ' + esc(calcResp.error || "Unknown error") + '</div></div>');
+
+            vigHistory.push({role:"assistant", content:cleanAnswer + "\n\nCalculation error: " + (calcResp.error || "Unknown error")});
+          }
+          m.scrollTop = m.scrollHeight;
+        })
+        .catch(function(err){
+          vigAppend('<div class="vig-row agent"><div class="vig-bubble" style="color:#c00;">Calculation error: ' + esc(err.toString()) + '</div></div>');
+
+          vigHistory.push({role:"assistant", content:cleanAnswer + "\n\nCalculation error: " + err.toString()});
+          m.scrollTop = m.scrollHeight;
+        });
+
+      return;
+    }
+
+    vigHistory.push({role:"assistant", content:cleanAnswer || rawAnswer});
+    m.scrollTop = m.scrollHeight;
+  })
+  .catch(function(err){
+    var el = document.getElementById(tid);
+    if (el) {
+      el.innerHTML = '<div class="vig-bubble" style="color:#c00;">Sorry, something went wrong: ' + esc(err.message || err.toString()) + '</div>';
+    }
+    console.error("vigSendMsg error:", err);
+  })
+  .finally(function(){ vigBusy=false; document.getElementById("vigSendBtn").disabled=false; });
+}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");}
+function fmt(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>");}
+function calcCard(r){
+  if(!r||r.error)return'<div class="vig-calc-card" style="border-left-color:#c00"><div class="vig-calc-card-title" style="color:#c00">Calculation error</div>'+(r?r.error:"Unknown")+'</div>';
+
+  // Glass failure result — use dedicated renderer
+  if(r.mode==='glass_failure') {
+    return vigRenderFailureCard(r);
+  }
+
+  // Thermal stress summary — use dedicated renderer
+  if(r.mode==='thermal_stress' && (r.output_mode==='summary'||!r.output_mode) && r.L_m!==undefined) {
+    // Build baseParams from result for re-queries
+    var bp = {
+      mode:'thermal_stress', bc:r.bc,
+      L:r.L_m, W:r.W_m, t1:r.t1_m, t2:r.t2_m,
+      g:r.g_m, b:r.b_m,
+      T1:r.T1_C, T2:r.T2_C, T_ref:r.T_ref_C,
+      E:70e9, nu:0.22, alpha:9e-6,
+      S_p: (r.atmospheric_prestress && r.atmospheric_prestress.S_p_used_m) || 0.040,
+      r_p: (r.atmospheric_prestress && r.atmospheric_prestress.r_p_used_m) || 0.00025,
+      surfaces: r.requested_surfaces
+    };
+    return vigRenderStressSummary(r, bp);
+  }
+  // Thermal stress point result — show inline in chat
+  if(r.mode==='thermal_stress' && r.output_mode==='point') {
+    var surfaces = r.requested_surfaces || [1,4];
+    var sr = r.surface_results || {};
+    var rows='';
+    surfaces.forEach(function(s){
+      var d=sr[String(s)]; if(!d)return;
+      rows+='<tr><td>Surface '+s+(s==1?' (outer, pane 1)':' (outer, pane 2)')+'</td><td>σ_xx: '+d.sigma_xx_MPa.toFixed(4)+' | σ_yy: '+d.sigma_yy_MPa.toFixed(4)+' MPa ('+d.region+')</td></tr>';
+    });
+    return '<div class="vig-stress-card"><div class="vig-stress-card-title">🔬 Stress at ('+r.x_m+', '+r.y_m+') m — '+esc(r.bc_label||r.bc)+'</div><table width="100%" style="border-collapse:collapse;font-size:12px;">'+rows+'</table><div style="font-size:11px;color:#66756d;margin-top:6px;">Centre deflection: '+r.centre_deflection_mm+' mm</div></div>';
+  }
+
+  var rows="";
+  var geomLabel = ((r.mode === "environmental" || r.mode === "measurement") && vigLastParams && vigLastParams.pillar_type && GEOMS[vigLastParams.pillar_type]) ? GEOMS[vigLastParams.pillar_type].name : null;
+  var cardTitle = geomLabel ? "Calculation Result — " + geomLabel + " pillar" : "Calculation Result";
+  if(r.U_air_to_air!==undefined)       rows+="<tr><td>U air-to-air</td><td>"+r.U_air_to_air+" W/m²K</td></tr>";
+  if(r.U_surface_to_surface!==undefined)rows+="<tr><td>U surface-to-surface</td><td>"+r.U_surface_to_surface+" W/m²K</td></tr>";
+  if(r.R_value!==undefined)             rows+="<tr><td>R-value</td><td>"+r.R_value+" m²K/W</td></tr>";
+  if(r.C_pa!==undefined)                rows+="<tr><td>C_pa / C_rad / C_cond</td><td>"+r.C_pa+" / "+r.C_rad+" / "+r.C_cond+"</td></tr>";
+  if(r.pct_pillar!==undefined)          rows+="<tr><td>Pillar / Rad / Gas</td><td>"+r.pct_pillar+"% / "+r.pct_radiation+"% / "+r.pct_gas+"%</td></tr>";
+  var shownCStar = ((r.mode === "from_c_star" || r.mode === "from_measured_C_star")
+                    ? (r.C_star_input !== undefined ? r.C_star_input : (r.C_star !== undefined ? r.C_star : undefined))
+                    : undefined);
+  if(shownCStar!==undefined)            rows+="<tr><td>Input C*</td><td>"+shownCStar+" W/m²K</td></tr>";
+  return'<div class="vig-calc-card"><div class="vig-calc-card-title">'+cardTitle+'</div><table>'+rows+'</table></div>';
+}
+function calcTxt(r){
+  if(r.mode==='glass_failure'){
+    var s='Glass failure assessment — source: '+(r.source||'glass surface')+'\n';
+    s+='sigma_max: '+r.sigma_max_MPa+' MPa  |  sigma_min: '+r.sigma_min_MPa+' MPa  |  Area: '+r.area_m2+' m²\n';
+    s+='Duration: '+r.duration_label+'  |  k_mod: '+r.k_mod+'  |  Environment: '+r.environment+'\n';
+    if(r.stress_limit){
+      var sl=r.stress_limit;
+      s+='Stress limit check: '+sl.result_label+'  (peak '+sl.peak_stress_MPa+' MPa vs allowable '+sl.effective_allowable_MPa+' MPa';
+      if(sl.margin_pct!==null) s+='  margin '+(sl.margin_pct>0?'+':'')+sl.margin_pct+'%';
+      s+=')\n';
+    }
+    if(r.failure_probability){
+      var fp=r.failure_probability;
+      s+='Pf instantaneous: '+r.failure_probability.pf_instantaneous_fmt+'  ('+fp.interp_instantaneous+')\n';
+      if(r.is_long_term) s+='Pf long-term (delayed fracture): '+fp.pf_longterm_fmt+'  ('+fp.interp_longterm+')\n';
+      s+='Weibull: '+fp.weibull_label+'  |  c = '+fp.biaxial_factor_c+'  |  K_ratio = '+fp.K_ratio+'\n';
+    }
+    return s;
+  }
+  if(r.mode==='thermal_stress'){
+    var s='Thermal stress result — BC: '+(r.bc_label||r.bc)+'\n';
+    if(r.peak_stress_MPa!==undefined) s+='Peak stress: '+r.peak_stress_MPa+' MPa (surface '+r.peak_surface+', '+r.peak_region+')\n';
+    if(r.peak_sigma_xx_MPa!==undefined) s+='Peak location sigma_xx: '+r.peak_sigma_xx_MPa+' MPa  sigma_yy: '+r.peak_sigma_yy_MPa+' MPa\n';
+    if(r.centre_deflection_mm!==undefined) s+='Centre deflection: '+r.centre_deflection_mm+' mm\n';
+    if(r.max_deflection_mm!==undefined) s+='Max deflection: '+r.max_deflection_mm+' mm\n';
+    if(r.centre_stresses_MPa) s+='Centre stresses: '+JSON.stringify(r.centre_stresses_MPa)+' MPa\n';
+    if(r.mid_edge_stresses_MPa) s+='Mid-edge stresses: '+JSON.stringify(r.mid_edge_stresses_MPa)+' MPa\n';
+    if(r.surface_results) s+='Point stress at ('+r.x_m+','+r.y_m+'): '+JSON.stringify(r.surface_results)+'\n';
+    if(r.L_m!==undefined) s+='Panel: '+r.L_m+'×'+r.W_m+' m  t1='+r.t1_m+' m  t2='+r.t2_m+' m  area='+(r.L_m*r.W_m).toFixed(4)+' m²\n';
+    if(r.atmospheric_prestress){
+      var atm=r.atmospheric_prestress;
+      s+='Atmospheric prestress — S1 outer: '+atm.S1_outer_above_pillar_MPa+' MPa  S4 outer: '+atm.S4_outer_above_pillar_MPa+' MPa\n';
+    }
+    // Include embedded failure assessment in history so agent can discuss it
+    if(r.failure_assessment){
+      var fa=r.failure_assessment;
+      if(fa.thermal){
+        if(fa.thermal.compressive_only){
+          s+='[Failure assessment — thermal] '+fa.thermal.note+'\n';
+        } else {
+          s+='[Failure assessment — thermal] '+calcTxt(fa.thermal);
+        }
+      }
+      if(fa.atmospheric) s+='[Failure assessment — atmospheric] '+calcTxt(fa.atmospheric);
+    }
+    return s;
+  }
+  var s="";
+  if(r.mode)                            s+="Mode: "+r.mode+"\n";
+  if((r.mode === "environmental" || r.mode === "measurement") && vigLastParams && vigLastParams.pillar_type && GEOMS[vigLastParams.pillar_type]) s+="Pillar geometry: "+GEOMS[vigLastParams.pillar_type].name+"\n";
+  if(r.bc)                              s+="BC: "+r.bc+"\n";
+  if(r.U_air_to_air!==undefined)        s+="U air-to-air: "+r.U_air_to_air+" W/m²K\n";
+  if(r.U_surface_to_surface!==undefined)s+="U s-t-s: "+r.U_surface_to_surface+" W/m²K\n";
+  if(r.R_value!==undefined)             s+="R: "+r.R_value+" m²K/W\n";
+  if(r.C_pa!==undefined)                s+="C_pa: "+r.C_pa+" ("+r.pct_pillar+"%) C_rad: "+r.C_rad+" ("+r.pct_radiation+"%) C_cond: "+r.C_cond+" ("+r.pct_gas+"%)\n";
+  var shownCStar = ((r.mode === "from_c_star" || r.mode === "from_measured_C_star")
+                    ? (r.C_star_input !== undefined ? r.C_star_input : (r.C_star !== undefined ? r.C_star : undefined))
+                    : undefined);
+  if(shownCStar!==undefined)            s+="Input C*: "+shownCStar+" W/m²K\n";
+  return s;
+}
+
+/* ═══ DIALOG ═══ */
+function vigOpenCalc(){ vigStep=1; vigGeom=null; vigMode=null; vigRender(); document.getElementById("vigOverlay").classList.add("open"); }
+function vigCloseCalc(){ document.getElementById("vigOverlay").classList.remove("open"); }
+function vigOvClick(e){ if(e.target===document.getElementById("vigOverlay"))vigCloseCalc(); }
+function dots(n){ var h='<div class="d-dots">'; for(var i=1;i<=3;i++)h+='<div class="d-dot'+(i<=n?" on":"")+'"></div>'; return h+"</div>"; }
+function vigRender(){ if(vigStep===1)step1(); else if(vigStep===2)step2(); }
+
+function step1(){
+  var h='<div class="d-slabel">Step 1 of 3</div><div class="d-stitle">Choose calculation mode</div>';
+  h+='<div class="d-g3">';
+  h+=mBtn("environmental","Environmental","Air-to-air U-value");
+  h+=mBtn("measurement","Measurement","GHP / heat flux");
+  h+=mBtn("from_c_star","From C*","Project C* to env.");
+  h+="</div>";
+  h+='<div class="d-g2" style="margin-top:0;">';
+  h+=mBtn("thermal_stress","Thermal Stress","Pane stresses &amp; deflection");
+  h+="</div>";
+  if(vigMode==="environmental"||vigMode==="measurement"){
+    if(vigMode==="measurement")h+='<div class="d-info"><strong>Measurement mode</strong> — Glass surface temperatures applied directly by instrument.</div>';
+    h+='<div class="d-sectitle">Pillar geometry</div><div class="d-g2">';
+    Object.keys(GEOMS).forEach(function(k){h+=gBtn(k,GEOMS[k].name,GEOMS[k].desc);});
+    h+="</div>";
+  } else if(vigMode==="from_c_star"){
+    h+='<div class="d-info"><strong>From C* mode</strong> — Provide a measured C* value. No pillar geometry needed.</div>';
+  } else if(vigMode==="thermal_stress"){
+    h+='<div class="d-info"><strong>Thermal Stress mode</strong> — Calculates pane stresses, deflection, and atmospheric pressure prestress for a VIG panel under uniform pane temperatures.</div>';
+  }
+  var ok=((vigMode==="environmental"||vigMode==="measurement")&&vigGeom)||vigMode==="from_c_star"||vigMode==="thermal_stress";
+  h+='<div class="d-nav"><div>'+dots(1)+'</div><button class="d-next" id="s1n"'+(ok?"":" disabled")+'>Next &rarr;</button></div>';
+  document.getElementById("vigDlgBody").innerHTML=h;
+  document.querySelectorAll(".vm").forEach(function(b){b.addEventListener("click",function(){vigMode=this.dataset.m;vigGeom=null;step1();});});
+  document.querySelectorAll(".vg").forEach(function(b){b.addEventListener("click",function(){vigGeom=this.dataset.g;step1();});});
+  var nb=document.getElementById("s1n"); if(nb)nb.addEventListener("click",function(){if(ok){vigStep=2;vigRender();}});
+}
+function mBtn(m,n,d){var s=vigMode===m?" sel":"";return'<button class="d-card vm'+s+'" data-m="'+m+'"><span class="cn">'+n+'</span><span class="cd">'+d+'</span></button>';}
+function gBtn(k,n,d){var s=vigGeom===k?" sel":"";return'<button class="d-card vg'+s+'" data-g="'+k+'"><span class="cn">'+n+'</span><span class="cd">'+d+'</span></button>';}
+
+function step2(){ if(vigMode==="environmental")s2env(); else if(vigMode==="measurement")s2meas(); else if(vigMode==="from_c_star")s2cstar(); else if(vigMode==="thermal_stress")s2stress(); }
+function pf(){ var g=GEOMS[vigGeom],h=""; g.fields.forEach(function(f){h+='<div class="d-field"><label>'+f.label+'</label>'+(f.hint?'<div class="d-hint">'+f.hint+'</div>':'')+'<input type="number" id="f_'+f.id+'" value="'+f.def+'" step="any"/></div>'; }); return h; }
+function gf(){ return'<div class="d-row2"><div class="d-field"><label>k_glass [W/mK]</label><input type="number" id="f_kg" value="1.0" step="any"/></div><div class="d-field"><label>t_g [m]</label><div class="d-hint">Both panes — default 3 mm</div><input type="number" id="f_tg" value="0.003" step="any"/></div></div>'; }
+function ef(){ return'<div class="d-row2"><div class="d-field"><label>ε₂ inner pane 1</label><div class="d-hint">Low-e≈0.03, uncoated≈0.84</div><input type="number" id="f_e2" value="0.03" step="any"/></div><div class="d-field"><label>ε₃ inner pane 2</label><div class="d-hint">Low-e≈0.03, uncoated≈0.84</div><input type="number" id="f_e3" value="0.84" step="any"/></div></div>'; }
+function gasf(){ return '<div class="d-info"><strong>Residual gas model</strong> — defaults match the methodology document. Leave unchanged unless you want to specify gas properties explicitly.</div><div class="d-row2"><div class="d-field"><label>α accommodation coefficient</label><div class="d-hint">Default 0.8</div><input type="number" id="f_alpha" value="0.8" step="any"/></div><div class="d-field"><label>γ specific heat ratio</label><div class="d-hint">Default 1.33</div><input type="number" id="f_gamma" value="1.33" step="any"/></div></div><div class="d-field"><label>M molecular weight [kg/kmol]</label><div class="d-hint">Default 18.23</div><input type="number" id="f_M" value="18.23" step="any"/></div>'; }
+function bcf(){
+  var h='<div class="d-field"><label>Boundary conditions</label><select id="f_bc"><option value="NFRC">NFRC (-18°C / 21°C)</option><option value="ISO">ISO 10292 (0°C / 20°C)</option><option value="custom">Custom</option></select></div>';
+  h+='<div id="f_cbc" style="display:none"><div class="d-row2"><div class="d-field"><label>T_out [°C]</label><input type="number" id="f_To" value="-18" step="any"/></div><div class="d-field"><label>T_in [°C]</label><input type="number" id="f_Ti" value="21" step="any"/></div></div>';
+  h+='<div class="d-row2"><div class="d-field"><label>R_o [m²K/W]</label><input type="number" id="f_Ro" value="0.034" step="any"/></div><div class="d-field"><label>R_i [m²K/W]</label><input type="number" id="f_Ri" value="0.147" step="any"/></div></div></div>';
+  return h;
+}
+function navRow(){ return'<div class="d-nav"><button class="d-back" id="s2b">&larr; Back</button>'+dots(2)+'<button class="d-next" id="s2c">Calculate &rarr;</button></div>'; }
+function attachBC(){ var s=document.getElementById("f_bc"); if(s)s.addEventListener("change",function(){document.getElementById("f_cbc").style.display=this.value==="custom"?"block":"none";}); }
+function attachNav(){ var b=document.getElementById("s2b"),c=document.getElementById("s2c"); if(b)b.addEventListener("click",function(){vigStep=1;vigRender();}); if(c)c.addEventListener("click",collect); }
+function fv(id){ var e=document.getElementById(id); return e?parseFloat(e.value):NaN; }
+
+function s2env(){
+  var h='<div class="d-slabel">Step 2 of 3</div><div class="d-stitle">'+GEOMS[vigGeom].name+' — Environmental</div>';
+  h+='<div class="d-sectitle">Pillar geometry</div>'+pf();
+  h+='<div class="d-sectitle">Glass properties</div>'+gf();
+  h+='<div class="d-sectitle">Pillar array</div><div class="d-field"><label>Pillar spacing S_p [m]</label><div class="d-hint">Typical 0.015–0.050 m</div><input type="number" id="f_Sp" value="0.020" step="any"/></div>';
+  h+='<div class="d-sectitle">Surface emissivities</div>'+ef();
+  h+='<div class="d-sectitle">Vacuum &amp; boundary conditions</div><div class="d-field"><label>Pressure P [Pa]</label><div class="d-hint">0.1 Pa = 0.001 torr</div><input type="number" id="f_P" value="0.1" step="any"/></div>'+gasf();
+  h+=bcf()+navRow();
+  document.getElementById("vigDlgBody").innerHTML=h;
+  attachBC(); attachNav();
+}
+function s2meas(){
+  var h='<div class="d-slabel">Step 2 of 3</div><div class="d-stitle">'+GEOMS[vigGeom].name+' — Measurement</div>';
+  h+='<div class="d-sectitle">Glass surface temperatures</div><div class="d-row2"><div class="d-field"><label>T_hot [°C]</label><div class="d-hint">e.g. 17.5</div><input type="number" id="f_Th" value="17.5" step="any"/></div><div class="d-field"><label>T_cold [°C]</label><div class="d-hint">e.g. 2.5</div><input type="number" id="f_Tc" value="2.5" step="any"/></div></div>';
+  h+='<div class="d-sectitle">Pillar geometry</div>'+pf();
+  h+='<div class="d-sectitle">Glass properties</div>'+gf();
+  h+='<div class="d-sectitle">Pillar array</div><div class="d-field"><label>Pillar spacing S_p [m]</label><input type="number" id="f_Sp" value="0.020" step="any"/></div>';
+  h+='<div class="d-sectitle">Emissivities</div>'+ef();
+  h+='<div class="d-sectitle">Vacuum pressure</div><div class="d-field"><label>P [Pa]</label><input type="number" id="f_P" value="0.1" step="any"/></div>'+gasf();
+  h+=navRow();
+  document.getElementById("vigDlgBody").innerHTML=h;
+  attachNav();
+}
+function s2cstar(){
+  var h='<div class="d-slabel">Step 2 of 3</div><div class="d-stitle">From C* — Project to environmental</div>';
+  h+='<div class="d-sectitle">Measured C* value</div><div class="d-field"><label>C* [W/m²K]</label><div class="d-hint">C_cond + C_pa from GHP (excludes radiation)</div><input type="number" id="f_Cs" placeholder="e.g. 1.15" step="any"/></div>';
+  h+='<div class="d-sectitle">Target glass</div>'+gf();
+  h+='<div class="d-sectitle">Surface emissivities</div>'+ef();
+  h+='<div class="d-sectitle">Boundary conditions</div>'+bcf()+navRow();
+  document.getElementById("vigDlgBody").innerHTML=h;
+  attachBC(); attachNav();
+}
+
+function vigSetFA(mode){
+  ['none','stress_limit','failure_probability'].forEach(function(m){
+    var btn=document.getElementById('fa_'+m+'_btn');
+    if(btn) btn.className='d-card'+(mode===m?' sel':'');
+  });
+  var fi=document.getElementById('fa_mode'); if(fi) fi.value=mode;
+  var sf=document.getElementById('fa_stress_fields');   if(sf) sf.style.display=(mode==='stress_limit')?'block':'none';
+  var pf=document.getElementById('fa_prob_fields');     if(pf) pf.style.display=(mode==='failure_probability')?'block':'none';
+}
+function s2stress(){
+  var h='<div class="d-slabel">Step 2 of 3</div><div class="d-stitle">Thermal Stress — Inputs</div>';
+  h+='<div class="d-sectitle">Panel dimensions</div>';
+  h+='<div class="d-row2"><div class="d-field"><label>Length L [m]</label><div class="d-hint">Default 500 mm</div><input type="number" id="fs_L" value="0.5" step="any"/></div>';
+  h+='<div class="d-field"><label>Width W [m]</label><div class="d-hint">Default 500 mm</div><input type="number" id="fs_W" value="0.5" step="any"/></div></div>';
+  h+='<div class="d-sectitle">Glass pane thicknesses</div>';
+  h+='<div class="d-row2"><div class="d-field"><label>Pane 1 thickness t₁ [m]</label><div class="d-hint">Default 3 mm</div><input type="number" id="fs_t1" value="0.003" step="any"/></div>';
+  h+='<div class="d-field"><label>Pane 2 thickness t₂ [m]</label><div class="d-hint">Default 3 mm</div><input type="number" id="fs_t2" value="0.003" step="any"/></div></div>';
+  h+='<div class="d-sectitle">Vacuum gap &amp; edge zone</div>';
+  h+='<div class="d-row2"><div class="d-field"><label>Gap height g [m]</label><div class="d-hint">Typical 0.0002 m (0.2 mm)</div><input type="number" id="fs_g" value="0.0002" step="any"/></div>';
+  h+='<div class="d-field"><label>Edge zone width b [m]</label><div class="d-hint">Typical 0.005 m (5 mm)</div><input type="number" id="fs_b" value="0.005" step="any"/></div></div>';
+  h+='<div class="d-sectitle">Pane temperatures (average)</div>';
+  h+='<div class="d-row2"><div class="d-field"><label>T₁ — pane 1 avg [°C]</label><div class="d-hint">Cold side, e.g. 10°C</div><input type="number" id="fs_T1" value="10" step="any"/></div>';
+  h+='<div class="d-field"><label>T₂ — pane 2 avg [°C]</label><div class="d-hint">Warm side, e.g. 20°C</div><input type="number" id="fs_T2" value="20" step="any"/></div></div>';
+  h+='<div class="d-field"><label>Reference temperature T_ref [°C]</label><div class="d-hint">Stress-free state temperature — leave blank to use mean of T₁ and T₂</div><input type="number" id="fs_Tref" placeholder="auto (mean)" step="any"/></div>';
+  h+='<div class="d-sectitle">Boundary conditions</div>';
+  h+='<div class="d-field"><label>Edge support type</label><select id="fs_bc"><option value="free">Free (unsupported edges)</option><option value="simply_supported" selected>Simply supported</option><option value="fixed">Fixed / clamped</option></select></div>';
+  h+='<div class="d-sectitle">Surface to analyse</div>';
+  h+='<div class="d-info">Surface 1 = outer face of pane 1 (colder side). Surface 4 = outer face of pane 2.</div>';
+  h+='<div class="d-g2"><button class="d-card" id="fs_s1btn" onclick="vigSelectSurface(1)"><span class="cn">Surface 1</span><span class="cd">Outer face, pane 1</span></button>';
+  h+='<button class="d-card sel" id="fs_s4btn" onclick="vigSelectSurface(4)"><span class="cn">Surface 4</span><span class="cd">Outer face, pane 2</span></button></div>';
+  h+='<input type="hidden" id="fs_surface" value="4"/>';
+  h+='<div class="d-sectitle">Pillar array (for atmospheric stress)</div>';
+  h+='<div class="d-row2"><div class="d-field"><label>Pillar spacing S_p [m]</label><div class="d-hint">Default 0.040 m (40 mm)</div><input type="number" id="fs_Sp" value="0.040" step="any"/></div>';
+  h+='<div class="d-field"><label>Pillar radius r_p [m]</label><div class="d-hint">Default 0.00025 m (0.25 mm)</div><input type="number" id="fs_rp" value="0.00025" step="any"/></div></div>';
+
+  // ── Failure Assessment ──
+  h+='<div class="d-sectitle">Failure Assessment</div>';
+  h+='<div class="d-info">Optional: assess the computed stresses against a glass strength criterion. Defaults apply — no changes required for a first assessment.</div>';
+  h+='<div class="d-g3">';
+  h+='<button class="d-card sel" id="fa_none_btn" onclick="vigSetFA(\'none\')"><span class="cn">Skip</span><span class="cd">Stress output only</span></button>';
+  h+='<button class="d-card" id="fa_stress_limit_btn" onclick="vigSetFA(\'stress_limit\')"><span class="cn">Stress limit</span><span class="cd">Deterministic k_mod check</span></button>';
+  h+='<button class="d-card" id="fa_failure_probability_btn" onclick="vigSetFA(\'failure_probability\')"><span class="cn">Failure probability</span><span class="cd">Weibull / crack growth</span></button>';
+  h+='</div>';
+  h+='<input type="hidden" id="fa_mode" value="none"/>';
+
+  // Stress limit fields
+  h+='<div id="fa_stress_fields" style="display:none">';
+  h+='<div class="d-row2">';
+  h+='<div class="d-field"><label>Long-term allowable σ [MPa]</label><div class="d-hint">Default 4 MPa — sustained / atmospheric load</div><input type="number" id="fa_allow_lt" value="4" step="any"/></div>';
+  h+='<div class="d-field"><label>Short-term allowable σ [MPa]</label><div class="d-hint">Default 10 MPa — short-duration thermal events</div><input type="number" id="fa_allow_st" value="10" step="any"/></div>';
+  h+='</div>';
+  h+='<div class="d-field"><label>Load duration</label><select id="fa_duration_sl">';
+  h+='<option value="1577000000">50 years — atmospheric (permanent)</option>';
+  h+='<option value="2592000">30 days — seasonal</option>';
+  h+='<option value="86400">1 day — daily cycle</option>';
+  h+='<option value="3600">1 hour — short thermal event</option>';
+  h+='</select></div>';
+  h+='</div>';
+
+  // Failure probability fields
+  h+='<div id="fa_prob_fields" style="display:none">';
+  h+='<div class="d-row2">';
+  h+='<div class="d-field"><label>Weibull parameter set</label><select id="fa_weibull">';
+  h+='<option value="abiassi">Beason &amp; Morgan (1984) — new glass m=9 (default)</option>';
+  h+='<option value="brown">Brown (1974) — as-received glass m=7.3</option>';
+  h+='</select></div>';
+  h+='<div class="d-field"><label>Environment</label><select id="fa_env">';
+  h+='<option value="air_50rh">Air at 50 % RH (default)</option>';
+  h+='<option value="water">Submerged / water</option>';
+  h+='</select></div>';
+  h+='</div>';
+  h+='<div class="d-field"><label>Load duration</label><select id="fa_duration_fp">';
+  h+='<option value="1577000000">50 years — atmospheric (permanent)</option>';
+  h+='<option value="2592000">30 days — seasonal</option>';
+  h+='<option value="86400">1 day — daily cycle</option>';
+  h+='<option value="3600">1 hour — short thermal event</option>';
+  h+='</select></div>';
+  h+='</div>';
+
+  h+='<div class="d-nav"><button class="d-back" id="s2b">&larr; Back</button>'+dots(2)+'<button class="d-next" id="s2c">Calculate &rarr;</button></div>';
+  document.getElementById("vigDlgBody").innerHTML=h;
+  document.getElementById("s2b").addEventListener("click",function(){vigStep=1;vigRender();});
+  document.getElementById("s2c").addEventListener("click",collectStress);
+}
+function vigSelectSurface(s){
+  document.getElementById("fs_surface").value=s;
+  document.getElementById("fs_s1btn").className="d-card"+(s===1?" sel":"");
+  document.getElementById("fs_s4btn").className="d-card"+(s===4?" sel":"");
+}
+function collectStress(){
+  var L=fv("fs_L"), W=fv("fs_W"), t1=fv("fs_t1"), t2=fv("fs_t2");
+  var g=fv("fs_g"), b=fv("fs_b"), T1=fv("fs_T1"), T2=fv("fs_T2");
+  var TrefEl=document.getElementById("fs_Tref"), Tref=TrefEl&&TrefEl.value.trim()!=""?parseFloat(TrefEl.value):(T1+T2)/2;
+  var bc=document.getElementById("fs_bc").value;
+  var surf=parseInt(document.getElementById("fs_surface").value)||4;
+  var Sp=fv("fs_Sp")||0.040, rp=fv("fs_rp")||0.00025;
+  if([L,W,t1,t2,g,b,T1,T2].some(isNaN)||L<=0||W<=0||t1<=0||t2<=0){
+    alert("Please check all inputs — all panel dimensions and temperatures are required."); return;
+  }
+  var params={mode:"thermal_stress",L:L,W:W,t1:t1,t2:t2,g:g,b:b,T1:T1,T2:T2,T_ref:Tref,
+              bc:bc,surfaces:[surf],S_p:Sp,r_p:rp,E:70e9,nu:0.22,alpha:9e-6};
+
+  // ── Failure assessment params ─────────────────────────────────────────
+  var faMode=(document.getElementById('fa_mode')||{value:'none'}).value;
+  console.log('[VIG] collectStress: faMode =', faMode);
+  function fv2(id,def){var e=document.getElementById(id);return e?parseFloat(e.value)||def:def;}
+  function fvs(id,def){var e=document.getElementById(id);return e?e.value:def;}
+  if(faMode==='stress_limit'){
+    params.failure_params={
+      check_type:'stress_limit',
+      allowable_Pa:   fv2('fa_allow_lt',4)*1e6,
+      allowable_st_Pa:fv2('fa_allow_st',10)*1e6,
+      duration_s:     fv2('fa_duration_sl',1577000000),
+      is_long_term:true, n_crack:16
+    };
+  } else if(faMode==='failure_probability'){
+    params.failure_params={
+      check_type:'failure_probability',
+      weibull_set: fvs('fa_weibull','abiassi'),
+      environment: fvs('fa_env','air_50rh'),
+      duration_s:  fv2('fa_duration_fp',1577000000),
+      is_long_term:true, n_crack:16
+    };
+  }
+  vigLastParams=params;
+  console.log('[VIG] collectStress: failure_params =', JSON.stringify(params.failure_params));
+  document.getElementById("vigDlgBody").innerHTML='<div class="d-slabel">Step 3 of 3</div><div class="d-stitle">Running calculation…</div><div style="text-align:center;padding:40px;color:#2f6b52;font-size:32px;">&#9881;</div>';
+  fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:"DIRECT_CALC",calc_params:params})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+      console.log('[VIG] collectStress response:', JSON.stringify(d).substring(0,1000));
+	  if(d.calculation&&!d.calculation.error){
+	        vigCloseCalc();
+	        var cardHtml;
+	        try {
+	          cardHtml = calcCard(d.calculation);
+	        } catch(cardErr) {
+	          console.error('[VIG] calcCard threw:', cardErr, d.calculation);
+	          cardHtml = '<div class="vig-stress-card" style="border-left-color:#c00"><div class="vig-stress-card-title" style="color:#c00">Display error</div><pre style="font-size:11px;white-space:pre-wrap;">'+esc(cardErr.toString())+'</pre></div>';
+	        }
+	        vigAppend(cardHtml);
+      var ctx="[VIG thermal stress result]\n"+calcTxt(d.calculation);
+      vigHistory.push({role:"user",content:ctx});
+      var assistMsg="Here are the thermal stress results.";
+      if(d.calculation.failure_assessment){
+        var fa=d.calculation.failure_assessment;
+        assistMsg+=" The failure assessment is shown below the stress data.";
+        if(fa.thermal){
+          if(fa.thermal.compressive_only)
+            assistMsg+=" Thermal: peak is compressive — no tensile fracture risk from thermal load alone.";
+          else if(fa.thermal.stress_limit)
+            assistMsg+=" Thermal stress limit: "+fa.thermal.stress_limit.result_label+".";
+          else if(fa.thermal.failure_probability)
+            assistMsg+=" Thermal P_f instantaneous: "+fa.thermal.failure_probability.pf_instantaneous_fmt
+              +(fa.thermal.is_long_term ? ", long-term: "+fa.thermal.failure_probability.pf_longterm_fmt : "")+".";
+        }
+        if(fa.atmospheric && fa.atmospheric.failure_probability)
+          assistMsg+=" Atmospheric long-term P_f: "+fa.atmospheric.failure_probability.pf_longterm_fmt+".";
+        assistMsg+=" I can discuss what's driving the results, compare configurations, or run further checks.";
+      } else {
+        assistMsg+=" I can discuss what's driving the stresses, query a specific point, or plot a line profile.";
+      }
+      vigHistory.push({role:"assistant",content:assistMsg});
+      document.getElementById("vigMsgs").scrollTop=99999;
+  } else {
+        console.error('[VIG] collectStress failed. d.calculation=', d.calculation, 'd.error=', d.error);
+        showErr((d.calculation&&d.calculation.error)||d.error||"Unknown error");
+    }
+  })
+  .catch(function(e){showErr(e.toString());});
+}
+
+function collect(){
+  var kg=fv("f_kg")||1.0, tg=fv("f_tg")||0.003;
+  var e2=fv("f_e2"), e3=fv("f_e3"), P=fv("f_P")||0.1;
+  var alpha=document.getElementById("f_alpha")?fv("f_alpha"):undefined;
+  var gamma=document.getElementById("f_gamma")?fv("f_gamma"):undefined;
+  var Mgas=document.getElementById("f_M")?fv("f_M"):undefined;
+  var Sp=document.getElementById("f_Sp")?fv("f_Sp"):null;
+  var bcEl=document.getElementById("f_bc"), bcVal=bcEl?bcEl.value:"NFRC";
+  function bc(){ if(bcVal==="custom")return{T_out:fv("f_To")+273.15,T_in:fv("f_Ti")+273.15,R_o:fv("f_Ro"),R_i:fv("f_Ri")}; return{bc:bcVal}; }
+  var params=null;
+  if(vigMode==="environmental"||vigMode==="measurement"){
+    var g=GEOMS[vigGeom], pp={};
+    g.fields.forEach(function(f){var el=document.getElementById("f_"+f.id);if(el)pp[f.id]=parseFloat(el.value);});
+    params=Object.assign({mode:vigMode,pillar_type:vigGeom,pillar_params:pp,S_p:Sp,epsilon2:e2,epsilon3:e3,t_g1:tg,k_g1:kg,t_g2:tg,k_g2:kg,k_glass1:kg,k_glass2:kg,P:P,alpha:alpha,gamma:gamma,M:Mgas},bc());
+    if(vigMode==="measurement"){params.T_hot=fv("f_Th")+273.15;params.T_cold=fv("f_Tc")+273.15;delete params.bc;}
+  } else if(vigMode==="from_c_star"){
+    var Cs=fv("f_Cs"); if(isNaN(Cs)||Cs<=0){alert("Please enter a valid C* value.");return;}
+    params=Object.assign({mode:"from_c_star",C_star:Cs,epsilon2:e2,epsilon3:e3,t_g1:tg,k_g1:kg,t_g2:tg,k_g2:kg},bc());
+  }
+  if(!params)return;
+
+  // ===== PARAMETER NORMALIZATION =====
+  params = normalizeCalcParams(params);
+
+  vigLastParams=params;
+  document.getElementById("vigDlgBody").innerHTML='<div class="d-slabel">Step 3 of 3</div><div class="d-stitle">Running calculation…</div><div style="text-align:center;padding:40px;color:#2f6b52;font-size:32px;">&#9881;</div>';
+  fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:"DIRECT_CALC",calc_params:params})})
+  .then(function(r){return r.json();})
+  .then(function(d){if(d.calculation)showRes(d.calculation);else showErr(d.error||"Unknown error");})
+  .catch(function(e){showErr(e.toString());});
+}
+
+function showRes(r){
+  vigLastResult=r;
+  var h='<div class="d-slabel">Step 3 of 3</div><div class="d-stitle">Results</div>';
+  h+='<div class="d-rhero"><div class="d-rgrid">';
+  if(r.U_air_to_air!==undefined)        h+='<div><div class="d-rlbl">U air-to-air</div><div class="d-rval">'+r.U_air_to_air+'</div><div class="d-runit">W/m²K</div></div>';
+  if(r.U_surface_to_surface!==undefined)h+='<div><div class="d-rlbl">U surface-to-surface</div><div class="d-rval">'+r.U_surface_to_surface+'</div><div class="d-runit">W/m²K</div></div>';
+  h+='</div>';
+  var ex=[]; if(r.R_value)ex.push("R="+r.R_value+" m²K/W"); if(r.heat_flux_W_m2)ex.push("q="+r.heat_flux_W_m2+" W/m²"); if(r.iterations)ex.push(r.iterations+" itr");
+  if(ex.length)h+='<div class="d-rextra">'+ex.join(" | ")+'</div>';
+  h+='</div>';
+  if(r.C_pa!==undefined){
+    h+='<div class="d-bars">';
+    h+=bar("Pillar (C_pa)",r.C_pa,r.pct_pillar,"#1f4d3a");
+    h+=bar("Radiation (C_rad)",r.C_rad,r.pct_radiation,"#2f6b52");
+    h+=bar("Gas (C_cond)",r.C_cond,r.pct_gas,"#7fa88c");
+    h+='</div>';
+  }
+  if(r.T2_C!==undefined||r.T_m_C!==undefined){
+    h+='<div class="d-temps">';
+    if(r.T2_C!==undefined) h+='<div><div class="d-tlbl">T2 (outdoor)</div><strong>'+r.T2_C+' °C</strong></div>';
+    if(r.T_m_C!==undefined)h+='<div><div class="d-tlbl">T_m (gap)</div><strong>'+r.T_m_C+' °C</strong></div>';
+    if(r.T3_C!==undefined) h+='<div><div class="d-tlbl">T3 (indoor)</div><strong>'+r.T3_C+' °C</strong></div>';
+    if(r.T_hot_C!==undefined) h+='<div><div class="d-tlbl">T_hot</div><strong>'+r.T_hot_C+' °C</strong></div>';
+    if(r.T_cold_C!==undefined)h+='<div><div class="d-tlbl">T_cold</div><strong>'+r.T_cold_C+' °C</strong></div>';
+    h+='</div>';
+  }
+  var shownCStar = ((r.mode === "from_c_star" || r.mode === "from_measured_C_star")
+                    ? (r.C_star_input !== undefined ? r.C_star_input : (r.C_star !== undefined ? r.C_star : undefined))
+                    : undefined);
+
+  if (shownCStar !== undefined) {
+    h += '<div class="d-cstar">Input C* = <strong>' + shownCStar + ' W/m²K</strong> — projected to the result shown below.</div>';
+  }
+  h+='<div class="d-nav"><button class="d-back" id="rb">&larr; Change inputs</button>'+dots(3)+'<button class="d-discuss" id="rd">Discuss in chat &rarr;</button></div>';
+  document.getElementById("vigDlgBody").innerHTML=h;
+  document.getElementById("rb").addEventListener("click",function(){vigStep=2;vigRender();});
+  document.getElementById("rd").addEventListener("click",sendToChat);
+}
+function bar(lbl,val,pct,col){
+  return'<div class="d-bar"><div class="d-barlbl"><span>'+lbl+'</span><strong>'+val+' W/m²K ('+pct+'%)</strong></div><div class="d-trk"><div class="d-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
+}
+function showErr(msg){
+  document.getElementById("vigDlgBody").innerHTML='<div class="d-slabel">Step 3 of 3</div><div class="d-stitle">Calculation error</div><div style="background:#fef0f0;border-radius:8px;padding:12px;color:#c00;font-size:13px;">'+esc(msg)+'</div><div class="d-nav"><button class="d-back" id="eb">&larr; Go back</button>'+dots(3)+'</div>';
+  document.getElementById("eb").addEventListener("click",function(){vigStep=2;vigRender();});
+}
+
+function sendToChat(){
+  var r=vigLastResult, p=vigLastParams||{}; if(!r)return;
+  vigCloseCalc();
+  var m=document.getElementById("vigMsgs");
+  vigAppend(calcCard(r)); 
+
+  // Build full input+output context for Claude's memory
+  var ctx="[VIG calculation result — treat this as computed data, not a question]\n\nINPUT PARAMETERS:\n";
+  ctx+="Mode: "+(p.mode||"environmental")+"\n";
+  if(p.pillar_type)ctx+="Pillar type: "+p.pillar_type+"\n";
+  if(p.pillar_params){
+    var pp=p.pillar_params;
+    if(pp.r!==undefined)        ctx+="  r: "+pp.r+" m\n";
+    if(pp.r1!==undefined)       ctx+="  r1: "+pp.r1+" m\n";
+    if(pp.r2!==undefined)       ctx+="  r2: "+pp.r2+" m\n";
+    if(pp.r_i!==undefined)      ctx+="  r_i: "+pp.r_i+" m\n";
+    if(pp.r_o!==undefined)      ctx+="  r_o: "+pp.r_o+" m\n";
+    if(pp.L!==undefined)        ctx+="  L: "+pp.L+" m\n";
+    if(pp.W!==undefined)        ctx+="  W: "+pp.W+" m\n";
+    if(pp.A_contact!==undefined)ctx+="  A_contact: "+pp.A_contact+" m²\n";
+    if(pp.f!==undefined)        ctx+="  f: "+pp.f+"\n";
+    if(pp.h!==undefined)        ctx+="  h: "+pp.h+" m\n";
+    if(pp.k_pillar!==undefined) ctx+="  k_pillar: "+pp.k_pillar+" W/mK\n";
+    if(pp.k_glass1!==undefined) ctx+="  k_glass: "+pp.k_glass1+" W/mK\n";
+  }
+  if(p.S_p!==undefined)   ctx+="S_p: "+p.S_p+" m\n";
+  if(p.epsilon2!==undefined)ctx+="ε₂: "+p.epsilon2+"\n";
+  if(p.epsilon3!==undefined)ctx+="ε₃: "+p.epsilon3+"\n";
+  if(p.t_g1!==undefined)  ctx+="t_g: "+p.t_g1+" m\n";
+  if(p.P!==undefined)     ctx+="P: "+p.P+" Pa\n";
+  if(p.alpha!==undefined) ctx+="alpha: "+p.alpha+"\n";
+  if(p.gamma!==undefined) ctx+="gamma: "+p.gamma+"\n";
+  if(p.M!==undefined)     ctx+="M: "+p.M+" kg/kmol\n";
+  if(p.bc)                ctx+="BC: "+p.bc+"\n";
+  if(p.T_out!==undefined) ctx+="T_out: "+(p.T_out-273.15).toFixed(2)+" °C\n";
+  if(p.T_in!==undefined)  ctx+="T_in: "+(p.T_in-273.15).toFixed(2)+" °C\n";
+  if(p.T_hot!==undefined) ctx+="T_hot: "+(p.T_hot-273.15).toFixed(2)+" °C\n";
+  if(p.T_cold!==undefined)ctx+="T_cold: "+(p.T_cold-273.15).toFixed(2)+" °C\n";
+  if(p.C_star!==undefined)ctx+="C* input: "+p.C_star+" W/m²K\n";
+  ctx+="\nOUTPUT RESULTS:\n"+calcTxt(r);
+
+  // Proper user+assistant pair to maintain alternating history pattern
+  vigHistory.push({role:"user",content:ctx});
+  vigHistory.push({role:"assistant",content:"Here are the results from that calculation. Happy to walk through what's driving the numbers, compare configurations, or explore what-if scenarios."});
+}
+
+</script>
+
+<!-- Trial Session + Logger -->
+<script>
+
+/* ══ TRIAL SESSION + USAGE LOGGER ══════════════════════════════
+   Reads the session key set by access.html from sessionStorage.
+   Checks it against the Lambda on page load.
+   Logs every AI query and calculator open — silently.
+*/
+var TRIAL_AUTH_API = "https://3ulwio3s4h.execute-api.us-east-1.amazonaws.com/prod/trial-auth";
+var TRIAL_SK_KEY   = "vigTrialKey";
+
+function trialGetKey() {
+  return sessionStorage.getItem(TRIAL_SK_KEY) || "";
+}
+
+function trialLog(eventType, detail) {
+  var sk = trialGetKey();
+  if (!sk) return;
+  try {
+    fetch(TRIAL_AUTH_API + "?action=log", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "X-Session-Key": sk },
+      body:    JSON.stringify({ event: eventType, detail: (detail||"").substring(0,150) })
+    });
+  } catch(e) { /* silent — logging must never break the agent */ }
+}
+
+/* Wrap vigSend to log every AI query (first 150 chars of question) */
+document.addEventListener("DOMContentLoaded", function() {
+  var _orig = window.vigSend;
+  window.vigSend = function() {
+    var q = (document.getElementById("vigIn")||{}).value || "";
+    if (q.trim()) trialLog("query", q.trim());
+    if (_orig) _orig.apply(this, arguments);
+  };
+  /* Log calculator opens */
+  var _origCalc = window.vigOpenCalc;
+  if (_origCalc) {
+    window.vigOpenCalc = function() {
+      trialLog("calc", "calculator opened");
+      _origCalc.apply(this, arguments);
+    };
+  }
+});
+
+/* ── Session check on page load ──────────────────────────────── */
+(function() {
+  var gate   = document.getElementById("trialGate");
+  var denied = document.getElementById("trialDenied");
+  var sk     = trialGetKey();
+
+  if (!sk) {
+    /* No key at all — back to access page */
+    gate.classList.add("hidden");
+    denied.classList.add("show");
+    return;
+  }
+
+  fetch(TRIAL_AUTH_API + "?action=check", {
+    headers: { "X-Session-Key": sk }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    gate.classList.add("hidden");
+    if (d.ok) {
+      /* Show expiry in nav */
+      var el = document.getElementById("trialExpiryLabel");
+      if (el && d.expires) {
+        var p = d.expires.split("-");
+        var dt = new Date(p[0], p[1]-1, p[2]);
+        el.textContent = "Expires " + dt.toLocaleDateString("en-AU",
+          {day:"numeric", month:"short", year:"numeric"});
+      }
+      trialLog("session", "page loaded");
+    } else {
+      denied.classList.add("show");
+    }
+  })
+  .catch(function() {
+    gate.classList.add("hidden");
+    denied.classList.add("show");
+  });
+})();
+
+</script>
+
+</body>
+</html>

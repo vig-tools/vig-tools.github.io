@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>VIG Expert — Trial Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #f0f5f1; color: #22302a; }
+    header {
+      background: #1f4d3a; color: #fff; padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; font-family: "Franklin Gothic Medium","Arial Narrow",Arial,sans-serif; }
+    .page-title { font-size: 0.85rem; color: #a8d4bc; margin-top: 2px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Login card */
+    #loginCard {
+      background: #fff; border-radius: 16px; padding: 40px;
+      box-shadow: 0 4px 20px rgba(31,77,58,0.10); max-width: 420px; margin: 60px auto;
+    }
+    #loginCard h2 { color: #1f4d3a; font-size: 1.1rem; margin-bottom: 18px; }
+    .f-label { font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: #7fa88c; display: block; margin-bottom: 5px; }
+    .f-input { width: 100%; padding: 10px 14px; border: 1.5px solid #c8d8cc;
+      border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 16px; }
+    .f-input:focus { border-color: #2f6b52; }
+    .f-btn { width: 100%; padding: 12px; background: #1f4d3a; color: #fff;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .f-btn:hover { background: #2f6b52; }
+    .f-err { color: #a00; font-size: 13px; margin-bottom: 12px; display: none; }
+
+    /* Dashboard */
+    #dashboard { display: none; }
+    .section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #7fa88c; margin-bottom: 12px; margin-top: 28px;
+    }
+    table { width: 100%; border-collapse: collapse; background: #fff;
+      border-radius: 10px; overflow: hidden;
+      box-shadow: 0 2px 10px rgba(31,77,58,0.07); font-size: 13px; }
+    th { background: #1f4d3a; color: #fff; text-align: left; padding: 11px 14px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+    td { padding: 11px 14px; border-bottom: 1px solid #eef6f0; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f7fbf7; }
+    .badge {
+      display: inline-block; border-radius: 10px; padding: 3px 10px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .badge-active  { background: #d4f0e0; color: #1a5c36; }
+    .badge-expired { background: #fde8e8; color: #9c2020; }
+    .info-box {
+      background: #fff; border-radius: 10px; padding: 18px 22px;
+      box-shadow: 0 2px 10px rgba(31,77,58,0.07); margin-bottom: 20px; font-size: 13px;
+    }
+    .info-box p { color: #44524a; margin: 0; line-height: 1.7; }
+    .info-box a { color: #2f6b52; }
+    .log-hint {
+      background: #eef6f0; border-radius: 8px; padding: 14px 16px;
+      font-size: 13px; color: #44524a; line-height: 1.7; margin-top: 20px;
+    }
+    .log-hint code { background: #d7e3da; border-radius: 4px; padding: 1px 6px; font-size: 12px; }
+    .no-data { text-align: center; padding: 32px; color: #7fa88c; }
+    .logout-btn {
+      background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px; padding: 7px 14px; font-size: 12px; cursor: pointer;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.25); }
+    .spinner { border: 2px solid #d7e3da; border-top-color: #1f4d3a;
+      border-radius: 50%; width: 22px; height: 22px;
+      animation: spin 0.7s linear infinite; margin: 40px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ts { font-size: 11px; color: #7fa88c; }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="brand">VIG Expert</div>
+    <div class="page-title">VIG Expert — Trial Dashboard</div>
+  </div>
+  <button class="logout-btn" id="logoutBtn" onclick="doLogout()" style="display:none">Sign out</button>
+</header>
+
+<!-- Login -->
+<div id="loginCard">
+  <h2>Dashboard Access</h2>
+  <div class="f-err" id="loginErr">Incorrect admin key. Please try again.</div>
+  <label class="f-label">Admin Key</label>
+  <input class="f-input" id="adminKeyField" type="password" placeholder="Enter admin key"
+         onkeydown="if(event.key==='Enter') doLogin()"/>
+  <button class="f-btn" onclick="doLogin()">Sign In</button>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="container">
+  <div id="loadSpinner"><div class="spinner"></div></div>
+  <div id="dashContent" style="display:none">
+    <div class="section-title">Trial Tokens</div>
+    <div class="info-box">
+      <p>The table below shows all configured trial tokens and their status.
+      To add, edit, or revoke tokens — update <code>TOKENS</code> in
+      <code>vig_trial_auth.py</code> and redeploy the Lambda.</p>
+    </div>
+    <table id="tokenTable">
+      <thead>
+        <tr>
+          <th>Token</th><th>Company</th><th>Expires</th><th>Status</th><th>Note</th>
+        </tr>
+      </thead>
+      <tbody id="tokenBody"></tbody>
+    </table>
+
+    <div class="log-hint">
+      <strong>Usage logs</strong> are written to CloudWatch Logs under the log group
+      <code>/aws/lambda/vig-trial-auth</code>. To view them:<br>
+      1. Open the <a href="https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups/log-group/$252Faws$252Flambda$252Fvig-trial-auth" target="_blank">CloudWatch Logs console</a><br>
+      2. Select the log stream for the date you want<br>
+      3. Filter by <code>TOKEN_ACCEPT</code>, <code>USAGE_QUERY</code>, or <code>USAGE_CALC</code><br><br>
+      Each log entry is a JSON object with: <code>event</code>, <code>company</code>,
+      <code>token</code>, <code>detail</code>, <code>ip</code>, <code>timestamp</code>.
+    </div>
+  </div>
+</div>
+
+<script>
+  var AUTH_API  = "https://3ulwio3s4h.execute-api.us-east-1.amazonaws.com/prod/trial-auth";
+  var ADMIN_KEY_STORE = "vigDashKey";
+  var adminKey  = "";
+
+  /* Auto-login if key stored in session */
+  (function() {
+    var k = sessionStorage.getItem(ADMIN_KEY_STORE);
+    if (k) { adminKey = k; showDashboard(); }
+  })();
+
+  function doLogin() {
+    adminKey = document.getElementById("adminKeyField").value.trim();
+    if (!adminKey) return;
+    document.getElementById("loginErr").style.display = "none";
+    showDashboard();
+  }
+
+  function doLogout() {
+    sessionStorage.removeItem(ADMIN_KEY_STORE);
+    adminKey = "";
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("loginCard").style.display = "block";
+    document.getElementById("logoutBtn").style.display = "none";
+  }
+
+  function showDashboard() {
+    document.getElementById("loginCard").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("logoutBtn").style.display = "inline-block";
+    loadTokens();
+  }
+
+  function loadTokens() {
+    fetch(AUTH_API + "?action=logs", {
+      headers: { "X-Admin-Key": adminKey }
+    })
+    .then(function(r) {
+      if (r.status === 403) throw new Error("forbidden");
+      return r.json();
+    })
+    .then(function(d) {
+      document.getElementById("loadSpinner").style.display = "none";
+      document.getElementById("dashContent").style.display = "block";
+      if (d.ok) {
+        sessionStorage.setItem(ADMIN_KEY_STORE, adminKey);
+        renderTokens(d.tokens, d.generated);
+      }
+    })
+    .catch(function(e) {
+      if (e.message === "forbidden") {
+        document.getElementById("loginCard").style.display = "block";
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "none";
+        document.getElementById("loginErr").style.display = "block";
+        sessionStorage.removeItem(ADMIN_KEY_STORE);
+      }
+    });
+  }
+
+  function renderTokens(tokens, generated) {
+    var tbody = document.getElementById("tokenBody");
+    tbody.innerHTML = "";
+    var today = new Date().toISOString().slice(0,10);
+    if (!tokens || !tokens.length) {
+      tbody.innerHTML = "<tr><td colspan='5' class='no-data'>No tokens configured.</td></tr>";
+      return;
+    }
+    tokens.forEach(function(t) {
+      var expired = today > t.expires;
+      var badge = expired
+        ? "<span class='badge badge-expired'>Expired</span>"
+        : "<span class='badge badge-active'>Active</span>";
+      var row = "<tr>" +
+        "<td><code>" + t.token + "</code></td>" +
+        "<td><strong>" + t.company + "</strong></td>" +
+        "<td>" + t.expires + "</td>" +
+        "<td>" + badge + "</td>" +
+        "<td style='color:#7fa88c'>" + (t.note||"") + "</td>" +
+        "</tr>";
+      tbody.innerHTML += row;
+    });
+    var ts = document.createElement("p");
+    ts.className = "ts";
+    ts.style.marginTop = "8px";
+    ts.textContent = "Generated: " + new Date(generated).toLocaleString("en-AU");
+    document.getElementById("dashContent").appendChild(ts);
+  }
+</script>
+</body>
+</html>
