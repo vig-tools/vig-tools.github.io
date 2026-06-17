@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>VIG AI Agent</title>
+  <title>VIG AI Agent — Trial Access</title>
   <link rel="stylesheet"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
@@ -1335,7 +1335,7 @@ function vigStressPointQuery(ptId, paramsOrKey) {
   params.x = x;
   params.y = y;
 
-  fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+  fetch(API,{method:'POST',headers:vigSessionHeaders(),
     body:JSON.stringify({question:'DIRECT_CALC',calc_params:params})})
   .then(function(r){return r.json();})
   .then(function(d){
@@ -1367,7 +1367,7 @@ function vigStressLineProfile(prId, paramsOrKey) {
   params.x1 = x1; params.y1 = y1;
   params.n_points = 51;
 
-  fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+  fetch(API,{method:'POST',headers:vigSessionHeaders(),
     body:JSON.stringify({question:'DIRECT_CALC',calc_params:params})})
   .then(function(r){return r.json();})
   .then(function(d){
@@ -1395,6 +1395,16 @@ function vigStressLineProfile(prId, paramsOrKey) {
 
 /* ═══ CONFIG ═══ */
 var API = "https://3ulwio3s4h.execute-api.us-east-1.amazonaws.com/prod/ask";
+
+/* Reads the trial session key set by access.html — used to tag every
+   /ask request so the agent Lambda can log which company is asking. */
+function vigSessionHeaders() {
+  var sk = sessionStorage.getItem("vigTrialKey") || "";
+  var h = { "Content-Type": "application/json" };
+  if (sk) h["X-Session-Key"] = sk;
+  return h;
+}
+
 var vigStep=1, vigGeom=null, vigMode=null;
 var vigLastResult=null, vigLastParams=null;
 var vigHistory=[], vigBusy=false;
@@ -1584,7 +1594,7 @@ function runCalcPayload(params) {
 
   return fetch(API, {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: vigSessionHeaders(),
     body: JSON.stringify({ question: "DIRECT_CALC", calc_params: params })
   }).then(function(r) {
     return r.text().then(function(txt) {
@@ -1613,7 +1623,7 @@ function vigSendMsg(q){
   var tid="vt"+Date.now();
   vigAppend('<div class="vig-row agent" id="'+tid+'"><div class="vig-bubble"><div class="vig-dots"><span></span><span></span><span></span></div></div></div>');
   m.scrollTop=m.scrollHeight;
-  fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,history:vigHistory})})
+  fetch(API,{method:"POST",headers:vigSessionHeaders(),body:JSON.stringify({question:q,history:vigHistory})})
   .then(function(r){
     return r.text().then(function(txt){
       try {
@@ -2072,7 +2082,7 @@ function collectStress(){
   vigLastParams=params;
   console.log('[VIG] collectStress: failure_params =', JSON.stringify(params.failure_params));
   document.getElementById("vigDlgBody").innerHTML='<div class="d-slabel">Step 3 of 3</div><div class="d-stitle">Running calculation…</div><div style="text-align:center;padding:40px;color:#2f6b52;font-size:32px;">&#9881;</div>';
-  fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:"DIRECT_CALC",calc_params:params})})
+  fetch(API,{method:"POST",headers:vigSessionHeaders(),body:JSON.stringify({question:"DIRECT_CALC",calc_params:params})})
   .then(function(r){return r.json();})
   .then(function(d){
       console.log('[VIG] collectStress response:', JSON.stringify(d).substring(0,1000));
@@ -2143,7 +2153,7 @@ function collect(){
 
   vigLastParams=params;
   document.getElementById("vigDlgBody").innerHTML='<div class="d-slabel">Step 3 of 3</div><div class="d-stitle">Running calculation…</div><div style="text-align:center;padding:40px;color:#2f6b52;font-size:32px;">&#9881;</div>';
-  fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:"DIRECT_CALC",calc_params:params})})
+  fetch(API,{method:"POST",headers:vigSessionHeaders(),body:JSON.stringify({question:"DIRECT_CALC",calc_params:params})})
   .then(function(r){return r.json();})
   .then(function(d){if(d.calculation)showRes(d.calculation);else showErr(d.error||"Unknown error");})
   .catch(function(e){showErr(e.toString());});
